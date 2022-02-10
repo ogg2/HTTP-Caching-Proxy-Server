@@ -7,6 +7,8 @@
 #include <syslog.h>
 #include <signal.h>
 
+#include "server.hpp"
+
 #define LOGGING "Start Logging my task = %d\n"
 
 int main () { 
@@ -57,8 +59,16 @@ int main () {
   //8 - log errors
   int count = 0; 
   openlog("Logs", LOG_PID, LOG_USER);
+
+
+  Server s;
+
+  int ret = s.server_init();
+
+  
   while (1) {
     sleep(2);
+    s.accept_connections();
     syslog(LOG_INFO, LOGGING, count++);
   }
   closelog();

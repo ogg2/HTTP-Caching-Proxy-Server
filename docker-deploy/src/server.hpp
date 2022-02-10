@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstring>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -6,12 +7,18 @@
 
 using namespace std;
 
-int main(int argc, char *argv[])
-{
+class Server {
+ private:
+ int socket_fd;
+ struct sockaddr_storage socket_addr;
+ socklen_t socket_addr_len;
+ int client_connection_fd;
+ struct addrinfo *host_info_list;
+
+ public:
+ int server_init() {
   int status;
-  int socket_fd;
   struct addrinfo host_info;
-  struct addrinfo *host_info_list;
   const char *hostname = NULL;
   const char *port     = "4444";
 
@@ -54,12 +61,14 @@ int main(int argc, char *argv[])
   } //if
 
   cout << "Waiting for connection on port " << port << endl;
-  struct sockaddr_storage socket_addr;
-  socklen_t socket_addr_len = sizeof(socket_addr);
-  int client_connection_fd;
+  socket_addr_len = sizeof(socket_addr);
+  return 1;
+ }
 
-  while (true) {
-  
+  int accept_connections() {
+    ofstream myfile;
+    myfile.open ("log.txt");
+    
     client_connection_fd = accept(socket_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
     if (client_connection_fd == -1) {
       cerr << "Error: cannot accept connection on socket" << endl;
@@ -70,12 +79,14 @@ int main(int argc, char *argv[])
     recv(client_connection_fd, buffer, 9, 0);
     buffer[9] = 0;
 
-    cout << "Server received: " << buffer << endl;
+    myfile << "Server received: " << buffer << endl;
+    myfile.close();
+    return 1;
+  }
 
+  void close_socket() {
+    freeaddrinfo(host_info_list);
+    close(socket_fd);
   }
   
-  freeaddrinfo(host_info_list);
-  close(socket_fd);
-
-  return 0;
-}
+};

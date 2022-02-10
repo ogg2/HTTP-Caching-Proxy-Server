@@ -6,12 +6,18 @@
 
 using namespace std;
 
-int main(int argc, char *argv[])
-{
+class Server {
+ private:
+ int socket_fd;
+ struct sockaddr_storage socket_addr;
+ socklen_t socket_addr_len;
+ int client_connection_fd;
+ struct addrinfo *host_info_list;
+
+ public:
+ int server_init() {
   int status;
-  int socket_fd;
   struct addrinfo host_info;
-  struct addrinfo *host_info_list;
   const char *hostname = NULL;
   const char *port     = "4444";
 
@@ -54,23 +60,28 @@ int main(int argc, char *argv[])
   } //if
 
   cout << "Waiting for connection on port " << port << endl;
-  struct sockaddr_storage socket_addr;
-  socklen_t socket_addr_len = sizeof(socket_addr);
-  int client_connection_fd;
-  client_connection_fd = accept(socket_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
-  if (client_connection_fd == -1) {
-    cerr << "Error: cannot accept connection on socket" << endl;
-    return -1;
-  } //if
+  socket_addr_len = sizeof(socket_addr);
+  return 1;
+ }
 
-  char buffer[512];
-  recv(client_connection_fd, buffer, 9, 0);
-  buffer[9] = 0;
+  int accept_connections() {
+    client_connection_fd = accept(socket_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
+    if (client_connection_fd == -1) {
+      cerr << "Error: cannot accept connection on socket" << endl;
+      return -1;
+    } //if
 
-  cout << "Server received: " << buffer << endl;
+    char buffer[512];
+    recv(client_connection_fd, buffer, 9, 0);
+    buffer[9] = 0;
 
-  freeaddrinfo(host_info_list);
-  close(socket_fd);
+    cout << "Server received: " << buffer << endl;
+    return 1;
+  }
 
-  return 0;
-}
+  void close_socket() {
+    freeaddrinfo(host_info_list);
+    close(socket_fd);
+  }
+  
+};
