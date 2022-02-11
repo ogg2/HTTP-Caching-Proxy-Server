@@ -58,13 +58,11 @@ int main () {
 
   //8 - log errors
   int count = 0; 
-  openlog("Logs", LOG_PID, LOG_USER);
-
+  openlog("erss/proxy", LOG_PID, LOG_DAEMON);
+  //openlog("Logs", LOG_PID, LOG_USER);
 
   Server s;
-
   int ret = s.server_init();
-
   
   while (1) {
     sleep(2);
@@ -72,6 +70,5 @@ int main () {
     syslog(LOG_INFO, LOGGING, count++);
   }
   closelog();
-  return 1;
-
+  return EXIT_SUCCESS;
 }
