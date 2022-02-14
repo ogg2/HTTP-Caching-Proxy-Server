@@ -1,68 +1,80 @@
-#include <stdio.h>
-#include <stdlib.h> //exit
-#include <unistd.h> //fork
-#include <string.h>
-#include <sys/stat.h> //umask
-#include <sys/types.h>
-#include <syslog.h>
-#include <signal.h>
-
-#include "server.hpp"
+#include "daemon.hpp"
 
 #define LOGGING "Start Logging my task = %d\n"
 
-int main () { 
-  pid_t pid;
-  int x_fd;
-
-  //1
+void Daemon::first_fork() {
   pid = fork();
   if (pid < 0) {
     exit(EXIT_FAILURE);
   }
-  //terminate parent
-  if (pid > 0) {
-    exit(EXIT_SUCCESS);
-  }
+}
 
-  //2 - set child as session leader
-  if (setsid() < 0) {
-    exit(EXIT_FAILURE);
-  }
- 
-  //3 - catch ignore handle signals
-  signal(SIGCHLD, SIG_IGN);
-  signal(SIGHUP, SIG_IGN);
-
-  //4  
-  pid = fork(); 
-  if (pid < 0) {
-    exit(EXIT_FAILURE);
-  }
-  //terminate parent
+void Daemon::terminate_parent() {
   if (pid > 0) {
     printf("Parent pid = %d\n", getpid());
     exit(EXIT_SUCCESS);
   }
+}
 
-  //5 - file permissions
+void Daemon::set_session_leader() {
+  if (setsid() < 0) {
+    exit(EXIT_FAILURE);
+  }
+}
+
+void Daemon::catch_signals() {
+  signal(SIGCHLD, SIG_IGN);
+  signal(SIGHUP, SIG_IGN);
+}
+
+void Daemon::second_fork() {
+  pid = fork();
+  if (pid < 0) {
+    exit(EXIT_FAILURE);
+  }
+}
+
+void Daemon::set_file_permissions() {
   umask(077);
+}
 
-  //6 - change working dir to root
+void Daemon::change_to_root() {
   chdir("/");
+}
 
-  //7 - close all file descriptors 
+void Daemon::close_file_descriptors() {
   for (x_fd = sysconf(_SC_OPEN_MAX); x_fd >= 0; x_fd--) {
     close (x_fd);
   }
+}
 
-  //8 - log errors
-  int count = 0; 
+void Daemon::logging() {
   openlog("erss/proxy", LOG_PID, LOG_DAEMON);
   //openlog("Logs", LOG_PID, LOG_USER);
+}
+
+int main () { 
+  Daemon d;
+
+  d.first_fork();
+  d.terminate_parent();
+  d.set_session_leader(); //set child as session leader
+  d.catch_signals(); //catch and ignore handle signals
+
+  d.second_fork();
+  d.terminate_parent();
+  d.set_file_permissions();
+  d.change_to_root(); //change workign directory to root
+  d.close_file_descriptors(); 
+  d.logging(); //log errors
 
   Server s;
   int ret = s.server_init();
+  if (ret == EXIT_FAILURE) {
+    std::cout << "Failed to initialize server." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  int count = 0;
   
   while (1) {
     sleep(2);
