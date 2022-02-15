@@ -27,6 +27,7 @@ public:
   void change_to_root();
   void close_file_descriptors();
   void logging();
+  static void server_message(Server server, int client_id);
 };
 
 #endif

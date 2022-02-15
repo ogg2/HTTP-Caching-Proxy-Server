@@ -64,23 +64,29 @@ public:
   }
 
   int accept_connections() {
-    std::ofstream myfile;
-    myfile.open ("log.txt");
-    
     client_connection_fd = accept(socket_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
     if (client_connection_fd == -1) {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
       return EXIT_FAILURE;
     }
 
+    return client_connection_fd;
+  }
+
+  int receive_message(int client_connection_fd) {
     char buffer[512];
     recv(client_connection_fd, buffer, 9, 0);
     buffer[9] = 0;
 
+    std::ofstream myfile;
+    myfile.open ("log.txt");
+    
     myfile << "Server received: " << buffer << std::endl;
     myfile.close();
     return EXIT_SUCCESS;
   }
+
+
 
   void close_socket() {
     freeaddrinfo(host_info_list);

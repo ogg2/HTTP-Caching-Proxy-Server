@@ -54,6 +54,10 @@ void Daemon::logging() {
   //openlog("Logs", LOG_PID, LOG_USER);
 }
 
+void server_message(Server server, int client_id) {
+  server.receive_message(client_id);
+}
+
 int main () { 
   Daemon d;
 
@@ -79,8 +83,15 @@ int main () {
   
   while (1) {
     sleep(2);
-    s.accept_connections();
-    syslog(LOG_INFO, LOGGING, count++);
+    int client_id = s.accept_connections();
+    if (client_id == -1) {
+      std::cerr << "Error: cannot accept connection on socket" << std::endl;
+    } else {
+      std::thread (server_message, s, client_id).detach();
+      syslog(LOG_INFO, LOGGING, count++);
+    }
+    //process request
+    //send response
   }
   closelog();
   return EXIT_SUCCESS;
