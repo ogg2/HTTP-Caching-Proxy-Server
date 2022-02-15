@@ -18,7 +18,7 @@ public:
     int status;
     struct addrinfo host_info;
     const char *hostname = NULL;
-    const char *port     = "4444";
+    const char *port     = "12345";
 
     memset(&host_info, 0, sizeof(host_info));
 

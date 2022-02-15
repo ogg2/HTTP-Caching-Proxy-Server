@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   struct addrinfo host_info;
   struct addrinfo *host_info_list;
   const char *hostname = argv[1];
-  const char *port     = "4444";
+  const char *port     = "12345";
   
   if (argc < 2) {
       cout << "Syntax: client <hostname>\n" << endl;
