@@ -1,7 +1,8 @@
 #include "daemon.hpp"
 #include <thread>
+#include <sstream>
 
-#define LOGGING "Start Logging my task = %d\n"
+#define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
 
 void Daemon::first_fork() {
   pid = fork();
@@ -54,7 +55,7 @@ void Daemon::logging() {
   //openlog("Logs", LOG_PID, LOG_USER);
 }
 
-void server_message(Server server, int client_id) {
+void Daemon::server_message(Server server, int client_id) {
   server.receive_message(client_id);
 }
 
@@ -87,8 +88,10 @@ int main () {
     if (client_id == -1) {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
     } else {
-      std::thread (server_message, s, client_id).detach();
-      syslog(LOG_INFO, LOGGING, count++);
+      std::thread (d.server_message, s, client_id).detach();
+      std::ostringstream oss;
+      oss << std::this_thread::get_id();
+      syslog(LOG_INFO, LOGGING, count++, oss.str().c_str());
     }
     //process request
     //send response
