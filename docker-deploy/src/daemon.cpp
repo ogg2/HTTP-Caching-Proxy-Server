@@ -1,4 +1,5 @@
 #include "daemon.hpp"
+#include <thread>
 
 #define LOGGING "Start Logging my task = %d\n"
 
