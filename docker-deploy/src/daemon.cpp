@@ -2,7 +2,8 @@
 #include <thread>
 #include <sstream>
 
-#define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
+#define LOGGING "Start Logging my task = %d\n"
+#define THREADLOG "\tThread ID = %s\n"
 
 void Daemon::first_fork() {
   pid = fork();
@@ -57,12 +58,18 @@ void Daemon::logging() {
 
 void Daemon::server_message(Server server, int client_id) {
   server.receive_message(client_id);
+
+  std::ostringstream oss;
+  oss << std::this_thread::get_id();
+  //syslog(LOG_INFO, THREADLOG, oss.str().c_str());
+  std::cout << "Thread ID: " << std::this_thread::get_id() << std::endl;
+  sleep(10);
 }
 
 int main () { 
   Daemon d;
 
-  d.first_fork();
+  /*d.first_fork();
   d.terminate_parent();
   d.set_session_leader(); //set child as session leader
   d.catch_signals(); //catch and ignore handle signals
@@ -72,7 +79,7 @@ int main () {
   d.set_file_permissions();
   d.change_to_root(); //change workign directory to root
   d.close_file_descriptors(); 
-  d.logging(); //log errors
+  d.logging(); //log errors*/
 
   Server s;
   int ret = s.server_init();
@@ -81,7 +88,7 @@ int main () {
     exit(EXIT_FAILURE);
   }
   int count = 0;
-  
+//  int thread_id = 0; 
   while (1) {
     sleep(2);
     int client_id = s.accept_connections();
@@ -89,13 +96,12 @@ int main () {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
     } else {
       std::thread (d.server_message, s, client_id).detach();
-      std::ostringstream oss;
-      oss << std::this_thread::get_id();
-      syslog(LOG_INFO, LOGGING, count++, oss.str().c_str());
+      std::cout << "Start Logging my task = " << count++ << std::endl;
+      //syslog(LOG_INFO, LOGGING, count++);
     }
     //process request
     //send response
   }
-  closelog();
+  //closelog();
   return EXIT_SUCCESS;
 }
