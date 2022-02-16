@@ -7,6 +7,7 @@
 #include "server.hpp"
 
 #define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
+#define THREADLOG "\tThread ID = %s\n"
 
 /* 
 - Socket daemon module to wait and recieve connections from clients
@@ -18,17 +19,18 @@
 
 std::mutex test_mutex;
 
-void count_up(int& x, int client_id) {
-  char buffer[512];
-  recv(client_id, buffer, 9, 0);
-  buffer[9] = 0;
-
-  std::cout << "Server received: " << buffer << std::endl;
+void count_up(Server& server, int& x, int client_id) {
   
   std::lock_guard<std::mutex> guard(test_mutex);
   x++;
-  std::ostringstream oss;
-  std::cout << std::this_thread::get_id();
+
+  server.receive_message(client_id);
+
+  //syslog(LOG_INFO, THREADLOG, oss.str().c_str());
+  std::cout << "Thread ID: " << std::this_thread::get_id() << std::endl;
+  std::cout << "X: " << x << std::endl;
+  sleep(10);
+  
 }
 
 
@@ -46,7 +48,7 @@ int main () {
     if (client_id == -1) {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
     } else {
-      std::thread (count_up, std::ref(count), client_id).detach();
+      std::thread (count_up, std::ref(s), std::ref(count), client_id).detach();
       //syslog(LOG_INFO, LOGGING, count++, oss.str().c_str());
     }
     //process request
