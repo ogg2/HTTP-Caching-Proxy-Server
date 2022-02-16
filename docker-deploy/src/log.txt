@@ -1,1 +1,1 @@
-Server received: hi there!
+Server received: GET http:
