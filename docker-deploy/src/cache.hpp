@@ -41,6 +41,24 @@ public:
       std::cout << "Response is expired" << std::endl;
     }
   }
+
+  std::string get_response() {
+    if (is_fresh()) {
+      return response;
+    } else {
+      return NULL;
+    }
+  }
+
+  void update_expiration(int max_age) {
+    time_t now;
+    time (&now);
+    expiration = now + max_age;
+  }
+
+  void update_response(std::string new_response) {
+    response = new_response;
+  }
 };
 
 #endif
