@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include <vector>
 #include <string>
-#include "responses.hpp"
-#include "parse_responses.hpp"
+#include "response.hpp"
+#include "parse_response.hpp"
 
 class ServerClient {
 private:
