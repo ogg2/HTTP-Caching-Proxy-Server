@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <vector>
 #include <string>
+#include "responses.hpp"
+#include "parse_responses.hpp"
 
 class ServerClient {
 private:
@@ -112,23 +114,33 @@ public:
 
   //make_response() and forward to client socket 0.0.0.0 12345
   //close
-  int receive_message(int client_connection_fd) {
-    char buffer[512];
-    recv(client_connection_fd, buffer, 512, 0);
-    buffer[512] = 0;
+  Response * receive_message(int client_connection_fd) {
+    Response * response;
+    do {
+      char buffer[1024];
+      ssize_t bytes = recv(client_connection_fd, buffer, 1024, 0);
+      buffer[1024] = 0;
 
-    //Response response = parse_response(buffer);
+      std::vector<char> buffer_vector;
+      buffer_vector.insert(buffer_vector.end(), buffer, buffer+1024);
 
-    std::ofstream myfile;
+      if (response == NULL) {
+        response = parse_response(buffer_vector);
+      } else {
+        response->append_body(buffer_vector);
+      }
+      std::cout << buffer << std::endl; //PRINT FOR DEBUGGING
+    } while (response->check_chunked_encoding());
+
+    /*std::ofstream myfile;
     myfile.open ("log.txt");
-    
     myfile << "Server received: " << buffer << std::endl;
-    std::cout << "Server received: " << buffer << std::endl;
-    myfile.close();
-    return EXIT_SUCCESS;
+    myfile.close();*/
+
+    return response;
   }
 
-  int client_receive() {
+  Response * client_receive() {
     return receive_message(socket_fd);
   }
 

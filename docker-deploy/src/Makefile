@@ -1,6 +1,6 @@
 CPPFLAGS=-std=gnu++11 -pedantic -Wall -Werror -ggdb3 -pthread
 
-all: main-res main-req main
+all: main-res main-req main test-response test
 
 main-res: main-res.cpp parse_responses.cpp    
 	g++ $(CPPFLAGS) -o main-res main-res.cpp parse_responses.cpp    
@@ -21,4 +21,4 @@ test-response: test_response.cpp parse_requests.cpp
 	g++ $(CPPFLAGS) -o test-response test_response.cpp parse_requests.cpp
 
 clean:
-	rm -f daemon test main main-req
+	rm -f daemon test main main-req test-response main-res

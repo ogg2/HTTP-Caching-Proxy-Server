@@ -1,8 +1,8 @@
 #include <iostream>
 #include "serverClient.hpp"
 #include <assert.h>
-#include "parse_requests.hpp"
 #include "requests.hpp"
+#include "parse_requests.hpp"
 
 std::vector<char> readFile(char * filename) {
   std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -17,6 +17,9 @@ std::vector<char> readFile(char * filename) {
 }
 
 int main(int argc, char ** argv) {
+  if (argc != 2) {
+    std::cout << "Usage: ./test_response <input file>" << std::endl;
+  }
   bool is_server = false;
   const char * hostname = "www.man7.org";
   const char * port = "80";
@@ -28,12 +31,12 @@ int main(int argc, char ** argv) {
   }
 
   std::vector<char> buffer = readFile(argv[1]);
-  Request * r = parse_request(buffer);
-  std::vector<char> new_req = r->make_get_req();  
+  Request * request = parse_request(buffer);
+  std::vector<char> new_request = request->make_get_req();  
 
-  client.send_message(new_req);
+  client.send_message(new_request);
 
-  client.client_receive();
+  Response * response = client.client_receive();
 
   return EXIT_SUCCESS;
 }
