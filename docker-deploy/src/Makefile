@@ -9,5 +9,8 @@ main: main.cpp
 #daemon: daemon.cpp daemon.hpp
 #	g++ $(CPPFLAGS) -o daemon daemon.cpp
 
+test: test_cache.cpp
+	g++ $(CPPFLAGS) -o test test_cache.cpp
+
 clean:
-	rm -f daemon
+	rm -f daemon test main
