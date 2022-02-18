@@ -17,8 +17,8 @@ main: main.cpp
 test: test_cache.cpp
 	g++ $(CPPFLAGS) -o test test_cache.cpp
 
-test-response: test_response.cpp parse_requests.cpp
-	g++ $(CPPFLAGS) -o test-response test_response.cpp parse_requests.cpp
+test-response: test_response.cpp parse_request.cpp
+	g++ $(CPPFLAGS) -o test-response test_response.cpp parse_request.cpp
 
 clean:
 	rm -f daemon test main main-req test-response main-res

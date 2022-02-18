@@ -41,13 +41,13 @@ public:
 	  string resource_,
 	  string version_,
 	  map<string, string> headers_,
-	  string body_)
+	  vector<char> body_)
     : req_type(req_type_),
       hostname(hostname_),
       resource(resource_),
       version(version_),
       headers(headers_),
-      body(body_) {
+      body(body_.begin(), body_.end()) {
   }
 
   void print() {
@@ -55,7 +55,7 @@ public:
     for (map<string, string>::iterator it = headers.begin(); it != headers.end(); ++it) {
       cout << it->first << ": " << it->second << endl;
     }
-    cout << endl <<  body << endl;
+    cout << endl << string(body.begin(), body.end()) << endl;
   }
 
   vector<char> make_get_req() {
