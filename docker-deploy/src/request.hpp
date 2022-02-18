@@ -1,5 +1,5 @@
-#ifndef REQUESTS_H
-#define REQUESTS_H
+#ifndef REQUEST_H
+#define REQUEST_H
 
 #include <stdio.h>
 #include <stdlib.h> //exit
@@ -33,7 +33,7 @@ private:
   string resource;
   string version;
   map<string, string> headers;
-  string body;
+  vector<char> body;
   
 public:
   Request(REQ_TYPES req_type_,

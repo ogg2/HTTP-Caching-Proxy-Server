@@ -2,11 +2,11 @@ CPPFLAGS=-std=gnu++11 -pedantic -Wall -Werror -ggdb3 -pthread
 
 all: main-res main-req main test-response test
 
-main-res: main-res.cpp parse_responses.cpp    
-	g++ $(CPPFLAGS) -o main-res main-res.cpp parse_responses.cpp    
+main-res: main-res.cpp parse_response.cpp    
+	g++ $(CPPFLAGS) -o main-res main-res.cpp parse_response.cpp    
 
-main-req: main-req.cpp parse_requests.cpp    
-	g++ $(CPPFLAGS) -o main-req main-req.cpp parse_requests.cpp    
+main-req: main-req.cpp parse_request.cpp    
+	g++ $(CPPFLAGS) -o main-req main-req.cpp parse_request.cpp    
 
 main: main.cpp
 	g++ $(CPPFLAGS) -o main main.cpp
