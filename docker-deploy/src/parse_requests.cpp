@@ -90,7 +90,7 @@ Request * parse_request(const vector<char> req) {
     while ((v != t) && (*v != ':')) { ++v; }
     string header_key(h, v);
     ++v;
-    while ((v != t) && (*v == ' ')) { ++v; }
+    while ((v != t) && ((*v == ' ') || (*v == '\t'))) { ++v; }
     string header_val(v, t);
 
     headers.insert({header_key, header_val});
@@ -104,6 +104,30 @@ Request * parse_request(const vector<char> req) {
       t += 1;
       h = t;
     }
+
+    if ((*h == ' ') || (*h == '\t')) {
+      while ((t != end) && (*t != '\r')) {
+	if (*t == '\n') { break; }
+	++t;
+      }
+      while ((h != t) && ((*h == ' ') || (*h == '\t'))) {
+	++h;
+      }
+      string prev_val = headers.find(header_key)->second;
+      headers.erase(header_key);
+      headers.insert({header_key, prev_val + string(h, t)});
+    }
+
+    if (t == end) { break; }
+    if (*t == '\r') {
+      t += 2;
+      h = t;
+    }
+    if (*t == '\n') {
+      t += 1;
+      h = t;
+    }
+    
   }
 
   if (*h == '\r') {
