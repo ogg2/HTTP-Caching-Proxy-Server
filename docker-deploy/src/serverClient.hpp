@@ -64,7 +64,7 @@ public:
   bool bind_socket() {
     int yes = 1;
     int status = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-    status = bind(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
+    status = ::bind(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
     if (status == -1) {
       std::cerr << "Error: cannot bind socket" << std::endl;
       std::cerr << "  (" << hostname << "," << port << ")" << std::endl;
@@ -115,25 +115,25 @@ public:
   //make_response() and forward to client socket 0.0.0.0 12345
   //close
   Response * receive_message(int client_connection_fd) {
-    Response * response;
+    Response * response = nullptr;
     do {
       char buffer[1024];
       ssize_t bytes = recv(client_connection_fd, buffer, 1024, 0);
-      buffer[1023] = 0;
 
-      std::cout << bytes << std::endl;
+      if (bytes == -1) {
+	std::cerr << "error ahhh" << std::endl;
+      }
+
+      buffer[bytes-1] = 0;
 
       std::vector<char> buffer_vector;
-      buffer_vector.insert(buffer_vector.end(), buffer, buffer+1024);
-
-      std::cout << "inserting" << std::endl;
+      buffer_vector.insert(buffer_vector.end(), buffer, buffer+bytes);
 
       if (response == NULL) {
         response = parse_response(buffer_vector);
       } else {
         response->append_body(buffer_vector);
       }
-      std::cout << buffer << std::endl; //PRINT FOR DEBUGGING
     } while (response->body_length() < response->content_length());
 
     /*std::ofstream myfile;
