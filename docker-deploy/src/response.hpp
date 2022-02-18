@@ -84,14 +84,14 @@ public:
   }
 
   bool check_chunked_encoding() {
-    map<string, string> it = headers.find("Transfer-Encoding");
+    map<string, string>::iterator it = headers.find("Transfer-Encoding");
     if (it == headers.end()) { return false; }
     if (it->second.compare("chunked") == 0) { return true; }
     return false;
   }
   
   int content_length() {
-    map<string, string> it = headers.find("Content-Length");
+    map<string, string>::iterator it = headers.find("Content-Length");
     if (it == headers.end()) { return -1; }
     return stoi(it->second);
   }

@@ -136,7 +136,7 @@ Request * parse_request(const vector<char> req) {
   if (*h == '\n') {
     ++h;
   }
-  string body(h, end);
+  vector<char> body(h, end);
 
   return new Request(req_type, hostname, resource, version, headers, body);
 }

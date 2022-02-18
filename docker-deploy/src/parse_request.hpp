@@ -1,7 +1,7 @@
-#ifndef PARSE_REQUESTS_H
-#define PARSE_REQUESTS_H
+#ifndef PARSE_REQUEST_H
+#define PARSE_REQUEST_H
 
-#include "requests.hpp"
+#include "request.hpp"
 
 size_t find_nth_char(string s, char c, int n);
 

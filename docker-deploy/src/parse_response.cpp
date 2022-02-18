@@ -99,7 +99,7 @@ Response * parse_response(const vector<char> resp) {
   if (*h == '\n') {
     ++h;
   }
-  string body(h, end);
+  vector<char> body(h, end);
 
   return new Response(status_code, reason_phrase, headers, body);
 }
