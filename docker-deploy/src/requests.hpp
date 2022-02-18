@@ -12,6 +12,9 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
 
@@ -31,8 +34,6 @@ private:
   string version;
   map<string, string> headers;
   string body;
-
-  //char * make_get_req() {}
   
 public:
   Request(REQ_TYPES req_type_,
@@ -55,6 +56,39 @@ public:
       cout << it->first << ": " << it->second << endl;
     }
     cout << endl <<  body << endl;
+  }
+
+  vector<char> make_get_req() {
+    string req_ty = "GET";
+    vector<char> buffer;
+
+    // first line
+    copy(req_ty.begin(), req_ty.end(), back_inserter(buffer));
+    buffer.push_back(' ');
+    copy(resource.begin(), resource.end(), back_inserter(buffer));
+    buffer.push_back(' ');
+    copy(version.begin(), version.end(), back_inserter(buffer));
+    buffer.push_back('\r');
+    buffer.push_back('\n');
+
+    // headers
+    for (map<string, string>::iterator it = headers.begin(); it != headers.end(); ++it) {
+      string header_key = it->first;
+      string header_val = it->second;
+      copy(header_key.begin(), header_key.end(), back_inserter(buffer));
+      buffer.push_back(':');
+      buffer.push_back(' ');
+      copy(header_val.begin(), header_val.end(), back_inserter(buffer));
+      buffer.push_back('\r');
+      buffer.push_back('\n');  
+    }
+
+    //body
+    buffer.push_back('\r');
+    buffer.push_back('\n');
+    copy(body.begin(), body.end(), back_inserter(buffer));
+
+    return buffer;
   }
 
 };

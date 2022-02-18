@@ -138,55 +138,5 @@ Request * parse_request(const vector<char> req) {
   }
   string body(h, end);
 
-  
-  /*
-  // init line
-  string line_1 = req_s.substr(0, req_s.find('\n'));
-  
-  size_t space_loc = line_1.find(' ');
-  string req_type_s = line_1.substr(0, space_loc);
- 
-
-  cout << "request type: " << req_type << endl;
-
-  size_t slash_loc = find_nth_char(line_1,'/', 3);
-  string hostname = line_1.substr(space_loc+1, slash_loc-space_loc-1);
-
-  cout << "hostname: " << hostname << endl;
-
-  string resource = line_1.substr(slash_loc, line_1.find(' ', slash_loc)-slash_loc);
-
-  cout << "resource: " << resource << endl;
-
-  // header
-  string line;
-  stringstream ss;
-  ss.str(req_s.substr(req_s.find('\n')+1));
-  get_line(
-  while (!line.empty()) {
-    
-    
-    cout << "l:" << header_line;
-    headers = headers + header_line;
-    headers_s = headers_s.substr(headers_s.find('\n')+1);
-    header_line = headers_s.substr(0, headers_s.find('\n')+1);
-    
-  }
-
-
-  cout << "headers: " << headers << endl;
-   
-  // body
-  string body = headers_s.substr(headers_s.find('\n'));
-
-  cout << "body: " << body << endl;
-
-  cout << "g\n";
-
-  */
-  
-  Request * r = new Request(req_type, hostname, resource, version, headers, body);
-  
-  return r;
-
+  return new Request(req_type, hostname, resource, version, headers, body);
 }
