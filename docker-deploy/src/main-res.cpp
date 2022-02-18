@@ -7,8 +7,8 @@
 #include <vector>
 #include <fstream>
 
-#include "responses.hpp"
-#include "parse_responses.hpp"
+#include "response.hpp"
+#include "parse_response.hpp"
 
 std::vector<char> readFile(char * filename) {
   std::ifstream file(filename, std::ios::binary | std::ios::ate);

@@ -1,5 +1,5 @@
-#ifndef REQUESTS_H
-#define REQUESTS_H
+#ifndef RESPONSE_H
+#define RESPONSE_H
 
 #include <stdio.h>
 #include <stdlib.h> //exit
@@ -25,17 +25,17 @@ private:
   int status_code;
   string reason_phrase;
   map<string, string> headers;
-  string body;
+  vector<char> body;
   
 public:
   Response(int status_code_,
 	   string reason_phrase_,
 	   map<string, string> headers_,
-	   string body_)
+	   vector<char> body_)
     : status_code(status_code_),
       reason_phrase(reason_phrase_),
       headers(headers_),
-      body(body_) {
+      body(body_.begin(), body_.end()) {
   }
 
   void print() {
@@ -43,7 +43,7 @@ public:
     for (map<string, string>::iterator it = headers.begin(); it != headers.end(); ++it) {
       cout << it->first << ": " << it->second << endl;
     }
-    cout << endl <<  body << endl;
+    cout << endl << string(body.begin(), body.end()) << endl;
   }
 
   vector<char> make_response() {
@@ -77,6 +77,27 @@ public:
     copy(body.begin(), body.end(), back_inserter(buffer));
 
     return buffer;
+  }
+
+  void append_body(vector<char> text) {
+    copy(text.begin(), text.end(), back_inserter(body));
+  }
+
+  bool check_chunked_encoding() {
+    map<string, string> it = headers.find("Transfer-Encoding");
+    if (it == headers.end()) { return false; }
+    if (it->second.compare("chunked") == 0) { return true; }
+    return false;
+  }
+  
+  int content_length() {
+    map<string, string> it = headers.find("Content-Length");
+    if (it == headers.end()) { return -1; }
+    return stoi(it->second);
+  }
+  
+  void add_header_field(string key, string val) {
+    headers.insert({key, val});
   }
 
 };
