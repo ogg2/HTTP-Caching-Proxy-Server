@@ -1,6 +1,11 @@
 CPPFLAGS=-std=gnu++11 -pedantic -Wall -Werror -ggdb3 -pthread
 
-main-req: main-req.cpp
+all: main-res main-req main
+
+main-res: main-res.cpp parse_responses.cpp    
+	g++ $(CPPFLAGS) -o main-res main-res.cpp parse_responses.cpp    
+
+main-req: main-req.cpp parse_requests.cpp    
 	g++ $(CPPFLAGS) -o main-req main-req.cpp parse_requests.cpp    
 
 main: main.cpp
