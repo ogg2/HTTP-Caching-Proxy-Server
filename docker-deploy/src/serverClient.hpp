@@ -119,10 +119,14 @@ public:
     do {
       char buffer[1024];
       ssize_t bytes = recv(client_connection_fd, buffer, 1024, 0);
-      buffer[1024] = 0;
+      buffer[1023] = 0;
+
+      std::cout << bytes << std::endl;
 
       std::vector<char> buffer_vector;
       buffer_vector.insert(buffer_vector.end(), buffer, buffer+1024);
+
+      std::cout << "inserting" << std::endl;
 
       if (response == NULL) {
         response = parse_response(buffer_vector);
@@ -130,7 +134,7 @@ public:
         response->append_body(buffer_vector);
       }
       std::cout << buffer << std::endl; //PRINT FOR DEBUGGING
-    } while (response->check_chunked_encoding());
+    } while (response->body_length() < response->content_length());
 
     /*std::ofstream myfile;
     myfile.open ("log.txt");

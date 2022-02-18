@@ -37,6 +37,7 @@ int main(int argc, char ** argv) {
   client.send_message(new_request);
 
   Response * response = client.client_receive();
+  response->print();
 
   return EXIT_SUCCESS;
 }

@@ -90,7 +90,7 @@ public:
     return false;
   }
   
-  int content_length() {
+  ssize_t content_length() {
     map<string, string>::iterator it = headers.find("Content-Length");
     if (it == headers.end()) { return -1; }
     return stoi(it->second);
@@ -98,6 +98,10 @@ public:
   
   void add_header_field(string key, string val) {
     headers.insert({key, val});
+  }
+
+  ssize_t body_length() {
+    return body.size();
   }
 
 };
