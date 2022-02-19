@@ -17,11 +17,11 @@ std::vector<char> readFile(char * filename) {
 }
 
 int main(int argc, char ** argv) {
-  if (argc != 2) {
+  if (argc != 3) {
     std::cout << "Usage: ./test_response <input file>" << std::endl;
   }
   bool is_server = false;
-  const char * hostname = "www.man7.org";
+  const char * hostname = argv[2];
   const char * port = "80";
   ServerClient client(hostname, port);
   int status = client.initialize_socket(is_server);
@@ -33,6 +33,7 @@ int main(int argc, char ** argv) {
   std::vector<char> buffer = readFile(argv[1]);
   Request * request = parse_request(buffer);
   std::vector<char> new_request = request->make_get_req();  
+  std::cout << string(new_request.begin(), new_request.end()) << std::endl;
 
   client.send_message(new_request);
 

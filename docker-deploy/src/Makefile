@@ -9,7 +9,7 @@ main-req: main-req.cpp parse_request.cpp
 	g++ $(CPPFLAGS) -o main-req main-req.cpp parse_request.cpp    
 
 main: main.cpp
-	g++ $(CPPFLAGS) -o main main.cpp
+	g++ $(CPPFLAGS) -o main main.cpp parse_response.cpp
 
 #daemon: daemon.cpp daemon.hpp
 #	g++ $(CPPFLAGS) -o daemon daemon.cpp

@@ -116,24 +116,29 @@ public:
   //close
   Response * receive_message(int client_connection_fd) {
     Response * response = nullptr;
+    ssize_t buffer_size = 1024;
+    std::vector<char> buffer(buffer_size);
     do {
-      char buffer[1024];
-      ssize_t bytes = recv(client_connection_fd, buffer, 1024, 0);
+      ssize_t bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
 
       if (bytes == -1) {
-	std::cerr << "error ahhh" << std::endl;
+	      std::cerr << "error ahhh" << std::endl;
       }
 
-      buffer[bytes-1] = 0;
+      if (bytes < buffer_size) {
+        buffer.resize(bytes);
+      }
+      //buffer[buffer.size()-1] = 0;
 
-      std::vector<char> buffer_vector;
-      buffer_vector.insert(buffer_vector.end(), buffer, buffer+bytes);
+      //std::vector<char> buffer_vector;
+      //buffer_vector.insert(buffer_vector.end(), buffer, buffer+bytes);
 
       if (response == NULL) {
-        response = parse_response(buffer_vector);
+        response = parse_response(buffer);
       } else {
-        response->append_body(buffer_vector);
+        response->append_body(buffer);
       }
+
     } while (response->body_length() < response->content_length());
 
     /*std::ofstream myfile;
