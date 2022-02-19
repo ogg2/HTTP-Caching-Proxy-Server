@@ -2,14 +2,14 @@ CPPFLAGS=-std=gnu++11 -pedantic -Wall -Werror -ggdb3 -pthread
 
 all: main-res main-req main test-response test
 
-main-res: main-res.cpp parse_response.cpp    
-	g++ $(CPPFLAGS) -o main-res main-res.cpp parse_response.cpp    
+main-res: main-res.cpp parse.cpp    
+	g++ $(CPPFLAGS) -o main-res main-res.cpp parse.cpp    
 
-main-req: main-req.cpp parse_request.cpp    
-	g++ $(CPPFLAGS) -o main-req main-req.cpp parse_request.cpp    
+main-req: main-req.cpp parse.cpp    
+	g++ $(CPPFLAGS) -o main-req main-req.cpp parse.cpp    
 
 main: main.cpp
-	g++ $(CPPFLAGS) -o main main.cpp parse_response.cpp
+	g++ $(CPPFLAGS) -o main main.cpp parse.cpp
 
 #daemon: daemon.cpp daemon.hpp
 #	g++ $(CPPFLAGS) -o daemon daemon.cpp
@@ -17,8 +17,8 @@ main: main.cpp
 test: test_cache.cpp
 	g++ $(CPPFLAGS) -o test test_cache.cpp
 
-test-response: test_response.cpp parse_request.cpp
-	g++ $(CPPFLAGS) -o test-response test_response.cpp parse_request.cpp parse_response.cpp
+test-response: test_response.cpp parse.cpp
+	g++ $(CPPFLAGS) -o test-response test_response.cpp parse.cpp
 
 clean:
 	rm -f daemon test main main-req test-response main-res

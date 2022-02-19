@@ -1,13 +1,15 @@
-#include <iostream>
-#include <fstream>
-#include <cstring>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+
+#include <iostream>
+#include <fstream>
+#include <cstring>
 #include <vector>
 #include <string>
+
 #include "response.hpp"
-#include "parse_response.hpp"
+#include "parse.hpp"
 
 class ServerClient {
 private:
