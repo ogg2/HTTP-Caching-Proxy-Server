@@ -22,3 +22,5 @@ test-response: test_response.cpp parse_request.cpp
 
 clean:
 	rm -f daemon test main main-req test-response main-res
+	rm -f *~
+	rm -r -f *.dSYM
