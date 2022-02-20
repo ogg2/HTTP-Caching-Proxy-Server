@@ -188,6 +188,7 @@ public:
   }
 
   bool send_request(std::vector<char> message) {
+    //return send_response(message, socket_fd);
     std::string buffer_string = std::string(message.begin(), message.end()); 
     const char * buffer = buffer_string.c_str();
 

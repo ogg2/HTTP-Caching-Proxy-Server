@@ -20,7 +20,7 @@ std::vector<char> readFile(char * filename) {
 
 int main(int argc, char ** argv) {
   if (argc != 3) {
-    std::cout << "Usage: ./test_response <input file>" << std::endl;
+    std::cout << "Usage: ./test_response <input file> <hostname>" << std::endl;
   }
   bool is_server = false;
   const char * hostname = argv[2];

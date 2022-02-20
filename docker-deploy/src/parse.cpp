@@ -136,7 +136,7 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
     try {
       hex_val = stoi(hex_str, 0, 16);
     }
-    catch (invalid_argument ia) {
+    catch (invalid_argument & ia) {
       cerr << "Invalid Argument: " << ia.what() << endl;
       return -1;
     }
