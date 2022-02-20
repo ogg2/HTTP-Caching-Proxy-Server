@@ -5,6 +5,7 @@
 #include <sstream>
 #include <mutex>
 #include <iostream>
+#include <set>
 
 #include "serverClient.hpp"
 #include "response.hpp"
@@ -17,10 +18,10 @@
   - Each connection spawns a new thread to run proxy server module
 */
 
-void proccess_request(ServerClient server, int fd) {
+void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   std::cout << "starting thread...\n"; 
   Request * request = server.receive_request(fd);
-  std::cout << "1. reccieved request\n";
+  std::cout << "1. recieved request\n";
    
   bool is_server = false;
   const char * hostname = request->get_hostname();
@@ -47,7 +48,9 @@ void proccess_request(ServerClient server, int fd) {
   std::vector<char> resp = response->make_response();
   //std::cout << string(resp.begin(), resp.end()) << std::endl;
   server.send_response(resp, fd);
-  std::cout << "5. sent response:\n"; 
+  std::cout << "5. sent response:\n";
+
+  ids.erase(fd);
 }
 
 
@@ -62,16 +65,24 @@ int main () {
   if (status == EXIT_FAILURE) {
     std::cout << "Failed to setup server." << std::endl;
     exit(EXIT_FAILURE);
-  }
+  } 
+  std::set<int> ids;
   while (1) {
     int client_id = server.accept_connections();
+    std::cout << "fd: " << client_id << std::endl;
     if (client_id == -1) {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
-    } else {
-      std::thread (proccess_request, std::ref(server), client_id).detach(); //do we need to use std::ref?
+    } else if (ids.count(client_id) == 0) {
+      //std::cout << "fd: " << client_id << std::endl;
+      ids.insert(client_id);
+      std::thread(proccess_request, std::ref(server), client_id, std::ref(ids)).detach(); //do we need to use std::ref?
     }
+    sleep(1);
+    
     //process request
     //send response
   }
+
+  server.close_socket();
   return EXIT_SUCCESS;
 }

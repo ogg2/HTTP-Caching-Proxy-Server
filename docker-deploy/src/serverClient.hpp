@@ -123,6 +123,13 @@ public:
     std::vector<char> buffer(buffer_size);
     int check = 1;
     ssize_t bytes = 0;
+
+    /*
+    while ((num_of_bytes = recv( c_socket, memblock, file_buf, 0 )) > 0) {
+        dest.write(memblock,num_of_bytes);
+    }
+    */
+    
     do {
       bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
       
@@ -159,19 +166,25 @@ public:
 
     do {
       bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
+
+      std::cout << fd << " recv\n";
       
       if (bytes == -1) { std::cerr << "error ahhh" << std::endl; }
       if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (request == nullptr) {
         request = parse_request(buffer);
+	std::cout << fd << "parse\n";
       } else {
         request->append_body(buffer);
+	std::cout << fd << "append\n";
       }
 
       buffer.resize(buffer_size);
 
       if (request->content_length() == -1) { break; }
+
+      std::cout << fd << "before while check\n";
 
     } while ((request->body_length() < request->content_length()));
 
@@ -179,7 +192,7 @@ public:
     myfile.open ("log.txt");
     myfile << "Server received: " << buffer << std::endl;
     myfile.close();*/
-
+    std::cout << fd << "outside loop\n";
     return request;
   }
 
