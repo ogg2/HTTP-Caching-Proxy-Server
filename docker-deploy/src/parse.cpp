@@ -316,7 +316,7 @@ Response * parse_response(const vector<char> resp) {
       t += 2;
       h = t;
     }
-    if (*t == '\n') {
+    else if (*t == '\n') {
       t += 1;
       h = t;
     }
@@ -332,17 +332,18 @@ Response * parse_response(const vector<char> resp) {
       string prev_val = headers.find(header_key)->second;
       headers.erase(header_key);
       headers.insert({header_key, prev_val + string(h, t)});
-    }
 
-    if (t == end) { break; }
-    if (*t == '\r') {
-      t += 2;
-      h = t;
+      
+      if (t == end) { break; }
+      if (*t == '\r') {
+	t += 2;
+	h = t;
+      }
+      else if (*t == '\n') {
+	t += 1;
+	h = t;
+      } 
     }
-    if (*t == '\n') {
-      t += 1;
-      h = t;
-    } 
   }
 
   if (*h == '\r') {

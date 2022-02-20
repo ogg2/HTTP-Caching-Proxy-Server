@@ -121,22 +121,12 @@ public:
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
     int check = 1;
+    ssize_t bytes = 0;
     do {
-      ssize_t bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
-
-      if (bytes == -1) {
-	      std::cerr << "error ahhh" << std::endl;
-      }
-
-      if (bytes < buffer_size) {
-        buffer.resize(bytes);
-      }
-      //buffer[buffer.size()-1] = 0;
-
-      //std::vector<char> buffer_vector;
-      //buffer_vector.insert(buffer_vector.end(), buffer, buffer+bytes);
-
-      //std::cout << "buffer:\n" << string(buffer.begin(), buffer.end()) << std::endl;
+      bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
+      
+      if (bytes == -1) { std::cerr << "error ahhh" << std::endl; }
+      if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (response == NULL) {
         response = parse_response(buffer);
@@ -148,7 +138,8 @@ public:
 
       buffer.resize(buffer_size);
 
-    } while ((response->body_length() < response->content_length()) || (check > 0));
+    } while ((response->body_length() < response->content_length())
+	     || (check > 0));
 
     /*std::ofstream myfile;
     myfile.open ("log.txt");
