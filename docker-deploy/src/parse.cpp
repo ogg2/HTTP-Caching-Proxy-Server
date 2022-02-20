@@ -24,15 +24,61 @@ size_t find_nth_char(string s, char c, int n) {
 
 
 vector<string> split_url(string url) {
-  size_t host_loc = find_nth_char(url, '/', 2);
-  size_t path_loc = find_nth_char(url, '/', 3);
-  string http = url.substr(0, host_loc);
-  string hostname = url.substr(host_loc+1, path_loc-host_loc-1);
+  size_t host_loc = url.find("://");
+  int n_colon = 2;
+  int n_slash = 3;
+
+  size_t host_start;
+  size_t host_length;
+  size_t port_start;
+  size_t port_length;
+  
+  if (host_loc == string::npos) {
+    host_start = 0;
+    n_slash = 1;
+    n_colon = 1;
+  }
+  else {
+    host_start = host_loc + 3;
+  }
+
+  cout << "host_start: " << host_start << endl;
+
+  size_t path_loc = find_nth_char(url, '/', n_slash);
+  cout << "path_loc: " << path_loc << endl;
+  size_t port_loc = find_nth_char(url, ':', n_colon);
+  cout << "port_loc: " << port_loc << endl;
+
+
+  if (port_loc != string::npos) {
+    host_length = port_loc - host_start;
+  }
+  else {
+    host_length = path_loc - host_start;
+  }
+
+  string hostname = url.substr(host_start, host_length);
+
+  if (path_loc == string::npos) { path_loc = url.length() - 1; }
   string pathname = url.substr(path_loc);
 
   vector<string> ret;
   ret.push_back(hostname);
   ret.push_back(pathname);
+
+  cout << "split_url.hostname: " << hostname << endl;
+  cout << "split_url.pathname: " << pathname << endl;
+
+  if (port_loc != string::npos) {
+    port_start = port_loc + 1;
+    port_length = path_loc - port_start;
+    ret.push_back(url.substr(port_start, port_length));
+    cout << "split_url.port: " << url.substr(port_start, port_length) << endl;
+  }
+  else {
+    ret.push_back("");
+  }
+  
   return ret;
 
 }
@@ -175,6 +221,7 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
 
 
 Request * parse_request(const vector<char> req) {
+  cout << "request in parse:\n" << string(req.begin(), req.end()) << endl;
 
   vector<char>::const_iterator h = req.begin();
   vector<char>::const_iterator t = h;
@@ -188,10 +235,17 @@ Request * parse_request(const vector<char> req) {
 
   while ((t != end) && (*t != ' ')) { ++t; }
   string url(h, t);
+<<<<<<< HEAD
   std::cout << "url: " << url << std::endl;
+=======
+
+  cout << "url: " << url << endl;
+  
+>>>>>>> d449fb9318f0e2ed59cffc570b73b6097fccc0a4
   vector<string> temp = split_url(url);
   string hostname = temp[0];
   string resource = temp[1];
+  string port = temp[2];
 
   ++t;
   h = t;
@@ -265,7 +319,7 @@ Request * parse_request(const vector<char> req) {
   }
   vector<char> body(h, end);
 
-  return new Request(req_type, hostname, resource, version, headers, body);
+  return new Request(req_type, hostname, port, resource, version, headers, body);
 }
 
 

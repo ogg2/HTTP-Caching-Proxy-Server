@@ -30,6 +30,7 @@ class Request {
 private:
   REQ_TYPES req_type;
   string hostname;
+  string port;
   string resource;
   string version;
   map<string, string> headers;
@@ -38,12 +39,14 @@ private:
 public:
   Request(REQ_TYPES req_type_,
 	  string hostname_,
+	  string port_,
 	  string resource_,
 	  string version_,
 	  map<string, string> headers_,
 	  vector<char> body_)
     : req_type(req_type_),
       hostname(hostname_),
+      port(port_),
       resource(resource_),
       version(version_),
       headers(headers_),
@@ -51,7 +54,9 @@ public:
   }
 
   void print() {
-    cout << req_type << " " << hostname << resource << " " << version << endl;
+    cout << req_type << " " << hostname;
+    if (port.length() > 0) { cout << ":" << port; }
+    cout << resource << " " << version << endl;
     for (map<string, string>::iterator it = headers.begin(); it != headers.end(); ++it) {
       cout << it->first << ": " << it->second << endl;
     }
