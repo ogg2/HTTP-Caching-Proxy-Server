@@ -22,6 +22,11 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   std::cout << "starting thread...\n"; 
   Request * request = server.receive_request(fd);
   std::cout << "1. recieved request\n";
+
+  if (request == nullptr) {
+    std::cerr << "Empty request" << std::endl;
+    return;
+  }
    
   bool is_server = false;
   const char * hostname = request->get_hostname();
@@ -77,8 +82,6 @@ int main () {
       ids.insert(client_id);
       std::thread(proccess_request, std::ref(server), client_id, std::ref(ids)).detach(); //do we need to use std::ref?
     }
-    sleep(1);
-    
     //process request
     //send response
   }

@@ -170,6 +170,7 @@ public:
       std::cout << fd << " recv\n";
       
       if (bytes == -1) { std::cerr << "error ahhh" << std::endl; }
+      if (bytes == 0) { break; }
       if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (request == nullptr) {

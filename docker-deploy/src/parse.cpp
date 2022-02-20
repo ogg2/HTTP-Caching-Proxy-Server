@@ -232,11 +232,14 @@ Request * parse_request(const vector<char> req) {
   ++t;
   h = t;
 
-  while ((t != end) && (*t != ' ')) { ++t; }
+  cout << string(req.begin(), req.end());
+  cout << "PRINT MARKER" << endl;
+  while ((t != end) && (*t != ' ')) { 
+    cout << "T: " << *t << endl;
+    ++t; 
+  }
   string url(h, t);
-
   cout << "url: " << url << endl;
-  
   vector<string> temp = split_url(url);
   string hostname = temp[0];
   string resource = temp[1];
