@@ -28,17 +28,16 @@ vector<string> split_url(string url) {
   int n_colon = 2;
   int n_slash = 3;
 
-  size_t host_start;
+  size_t host_start = 0;
   size_t host_length;
   size_t port_start;
   size_t port_length;
   
   if (host_loc == string::npos) {
-    host_start = 0;
     n_slash = 1;
     n_colon = 1;
   }
-  else {
+  else if (url.at(host_loc+1) == '/') {
     host_start = host_loc + 3;
   }
 
