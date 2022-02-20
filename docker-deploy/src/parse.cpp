@@ -76,11 +76,10 @@ vector<string> split_url(vector<char> url) {
   ret.push_back(pathname);
   ret.push_back(port);
 
-  /*
   cout << "split_url.hostname: " << hostname << endl;
   cout << "split_url.pathname: " << pathname << endl;
   cout << "split_url.port: " << port << endl;
-  */
+  
   return ret;
 }
 
@@ -222,7 +221,7 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
 
 
 Request * parse_request(const vector<char> req) {
-  cout << "request in parse:\n" << string(req.begin(), req.end()) << endl;
+  //cout << "request in parse:\n" << string(req.begin(), req.end()) << endl;
 
   vector<char>::const_iterator h = req.begin();
   vector<char>::const_iterator t = h;

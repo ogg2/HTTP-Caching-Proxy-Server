@@ -19,9 +19,9 @@
 */
 
 void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
-  std::cout << "starting thread...\n"; 
+  //std::cout << "starting thread...\n"; 
   Request * request = server.receive_request(fd);
-  std::cout << "1. recieved request\n";
+  //std::cout << "1. recieved request\n";
 
   if (request == nullptr) {
     std::cerr << "Empty request" << std::endl;
@@ -30,9 +30,9 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
    
   bool is_server = false;
   const char * hostname = request->get_hostname();
-  const char * port = "80";
+  const char * port = request->get_port();
 
-  std::cout << "1.5. got hostname\n";
+  //std::cout << "1.5. got hostname\n";
   
   
   ServerClient client(hostname, port);
@@ -42,21 +42,26 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
     return;
   }
 
-  std::cout << "2. created socket\n"; 
+  //std::cout << "2. created socket\n"; 
   if (!client.send_request(request->make_get_req())) { return; }
 
-  std::cout << "3. sent request\n"; 
+  //std::cout << "3. sent request\n"; 
   Response * response = client.client_receive();
-
-  std::cout << "4. recieved response:\n";
+  
+  //std::cout << "4. recieved response:\n";
   client.close_socket();
+
+  if (response == nullptr) {
+    std::cerr << "Error response" << std::endl;
+    return;
+  }
   
   //response->print();
 
   std::vector<char> resp = response->make_response();
   //std::cout << string(resp.begin(), resp.end()) << std::endl;
   server.send_response(resp, fd);
-  std::cout << "5. sent response:\n";
+  //std::cout << "5. sent response:\n";
 
   ids.erase(fd);
 }

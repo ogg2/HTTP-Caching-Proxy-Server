@@ -114,6 +114,11 @@ public:
     return hostname.c_str();
   }
 
+  const char * get_port() {
+    if (port.length() == 0) { return "80"; }
+    return port.c_str();
+  }
+
 };
 
 #endif
