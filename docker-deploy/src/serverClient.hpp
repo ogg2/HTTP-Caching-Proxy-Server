@@ -11,6 +11,7 @@
 #include "request.hpp"
 #include "response.hpp"
 #include "parse.hpp"
+#include "cache.hpp"
 
 class ServerClient {
 private:
@@ -19,6 +20,8 @@ private:
   struct addrinfo * host_info_list;
   const char * hostname;
   const char * port;
+  Cache * cache;
+  //get request - if in cache then return response
 
 public:
   ServerClient(const char * hostname_, const char * port_) : hostname(hostname_), port(port_) {
@@ -138,10 +141,10 @@ public:
 
       if (response == nullptr) {
         response = parse_response(buffer);
-	check = format_chunk(response, true, buffer);
+	      check = format_chunk(response, true, buffer);
       } else {
-	check = format_chunk(response, true, buffer);
-	if (check == -1) { response->append_body(buffer); }
+	      check = format_chunk(response, true, buffer);
+	      if (check == -1) { response->append_body(buffer); }
       }
 
       buffer.resize(buffer_size);
@@ -175,10 +178,10 @@ public:
 
       if (request == nullptr) {
         request = parse_request(buffer);
-	std::cout << fd << "parse\n";
+	      std::cout << fd << "parse\n";
       } else {
         request->append_body(buffer);
-	std::cout << fd << "append\n";
+	      std::cout << fd << "append\n";
       }
 
       buffer.resize(buffer_size);
@@ -202,8 +205,8 @@ public:
   }
 
   bool send_request(std::vector<char> message) {
-    //return send_response(message, socket_fd);
-    std::string buffer_string = std::string(message.begin(), message.end()); 
+    return send_response(message, socket_fd);
+    /*std::string buffer_string = std::string(message.begin(), message.end()); 
     const char * buffer = buffer_string.c_str();
 
     ssize_t status = send(socket_fd, buffer, message.size(), 0);    
@@ -211,7 +214,7 @@ public:
       std::cerr << "Error: could not send message on socket" << std::endl;
       return false;
     }
-    return true;
+    return true;*/
   }
 
   bool send_response(std::vector<char> message, int fd) {

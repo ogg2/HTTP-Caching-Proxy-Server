@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <time.h>
 #include <string>
+#include "response.hpp"
 
 /**
 * Class to store cached responses and metadata of responses
@@ -11,7 +12,7 @@
 class CacheEntry {
 private:
   time_t expiration; //tm_wday, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_year
-  std::string response;
+  Response * response;
 
   //okay to just have HashMap where key is url string, value is cache object
   //lru cache, double linked list and hashmap
@@ -43,11 +44,11 @@ public:
     }
   }
 
-  std::string get_response() {
+  Response * get_response() {
     if (is_fresh()) {
       return response;
     } else {
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -59,7 +60,7 @@ public:
   }
 
   //update response information, potentially combine with update_expiration
-  void update_response(std::string new_response) {
+  void update_response(Response * new_response) {
     response = new_response;
   }
   
