@@ -9,19 +9,19 @@ private:
   std::unordered_map<std::string, CacheEntry *> cache;
 
 public:
-  CacheEntry * findResponse(std::string url) {
-    std::unordered_map<std::string, CacheEntry *>::const_iterator it = cache.find(url);
+  CacheEntry * find_response(std::string resource) {
+    std::unordered_map<std::string, CacheEntry *>::const_iterator it = cache.find(resource);
     if (it == cache.end()) {
       return nullptr;
     }
     return it->second;
   }
 
-  void addEntry(std::string url, CacheEntry * entry) {
-    if (cache.count(url) == 0) {
-      cache.emplace(url, entry); 
+  void add_entry(std::string resource, CacheEntry * entry) {
+    if (cache.count(resource) == 0) {
+      cache.emplace(resource, entry); 
     } else {
-      std::unordered_map<std::string, CacheEntry *>::iterator it = cache.find(url);
+      std::unordered_map<std::string, CacheEntry *>::iterator it = cache.find(resource);
       it->second = entry;
     }
   }

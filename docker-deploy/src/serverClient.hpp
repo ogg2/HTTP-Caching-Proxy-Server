@@ -233,4 +233,8 @@ public:
     freeaddrinfo(host_info_list);
     close(socket_fd);
   }
+
+  Cache * get_cache() {
+    return cache;
+  }
 };

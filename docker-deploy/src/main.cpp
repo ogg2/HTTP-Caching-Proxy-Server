@@ -27,6 +27,7 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
     std::cerr << "Empty request" << std::endl;
     return;
   }
+
    
   bool is_server = false;
   const char * hostname = request->get_hostname();
@@ -43,7 +44,15 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   if (!client.send_request(request->make_get_req())) { return; }
 
   std::cout << "3. sent request\n"; 
-  Response * response = client.client_receive();
+
+  CacheEntry * cachedResponse;
+  Response * response;
+  if ((cachedResponse = server.get_cache()->find_response(request->get_resource())) != nullptr) {
+    std::cout << "Cached Response" << std::endl;
+    response = cachedResponse->get_response();
+  } else {
+    response = client.client_receive();
+  }
 
   std::cout << "4. recieved response:\n";
   client.close_socket();

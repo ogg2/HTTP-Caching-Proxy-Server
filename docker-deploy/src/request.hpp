@@ -114,6 +114,10 @@ public:
     return hostname.c_str();
   }
 
+  string get_resource() {
+    return resource;
+  }
+
 };
 
 #endif
