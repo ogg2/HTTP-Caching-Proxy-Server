@@ -37,7 +37,7 @@ int main(int argc, char ** argv) {
   std::vector<char> new_request = request->make_get_req();  
   std::cout << string(new_request.begin(), new_request.end()) << std::endl;
 
-  client.send_message(new_request);
+  client.send_request(new_request);
 
   Response * response = client.client_receive();
   response->print();

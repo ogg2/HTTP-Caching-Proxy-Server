@@ -91,6 +91,24 @@ public:
     return buffer;
   }
 
+  ssize_t content_length() {
+    map<string, string>::iterator it = headers.find("Content-Length");
+    if (it == headers.end()) { return -1; }
+    return stoi(it->second);
+  }
+
+  ssize_t body_length() {
+    return body.size();
+  }
+
+  void append_body(vector<char> text) {
+    copy(text.begin(), text.end(), back_inserter(body));
+  }
+
+  const char * get_hostname() {
+    return hostname.c_str();
+  }
+
 };
 
 #endif

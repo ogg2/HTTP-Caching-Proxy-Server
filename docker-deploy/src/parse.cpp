@@ -24,8 +24,10 @@ size_t find_nth_char(string s, char c, int n) {
 
 
 vector<string> split_url(string url) {
+  size_t host_loc = find_nth_char(url, '/', 2);
   size_t path_loc = find_nth_char(url, '/', 3);
-  string hostname = url.substr(0, path_loc);
+  string http = url.substr(0, host_loc);
+  string hostname = url.substr(host_loc+1, path_loc-host_loc-1);
   string pathname = url.substr(path_loc);
 
   vector<string> ret;

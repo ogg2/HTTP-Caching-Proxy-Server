@@ -1,11 +1,13 @@
 #include <pthread.h>
+#include <cstdio>
+
 #include <thread>
 #include <sstream>
 #include <mutex>
 #include <iostream>
-#include <cstdio>
 
 #include "serverClient.hpp"
+#include "response.hpp"
 
 #define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
 #define THREADLOG "\tThread ID = %s\n"
@@ -15,9 +17,43 @@
   - Each connection spawns a new thread to run proxy server module
 */
 
-void server_message(ServerClient server, int client_id) {
-  server.receive_message(client_id);
+void proccess_request(ServerClient server, int fd) {
+  std::cout << "starting thread...\n"; 
+  Request * request = server.receive_request(fd);
+  std::cout << "1. reccieved request\n";
+   
+  bool is_server = false;
+  const char * hostname = request->get_hostname();
+  const char * port = "80";
+  
+  ServerClient client(hostname, port);
+  int status = client.initialize_socket(is_server);
+  if (status == -1) {
+    std::cout << "Failed to setup client" << std::endl;
+    return;
+  }
+
+  std::cout << "2. created socket\n"; 
+  if (!client.send_request(request->make_get_req())) { return; }
+
+  std::cout << "3. sent request\n"; 
+  Response * response = client.client_receive();
+
+  std::cout << "4. recieved response:\n";
+  client.close_socket();
+  
+  //response->print();
+
+  std::vector<char> resp = response->make_response();
+  //std::cout << string(resp.begin(), resp.end()) << std::endl;
+  server.send_response(resp, fd);
+  std::cout << "5. sent response:\n"; 
 }
+
+
+//void server_message(ServerClient server, int client_id) {
+//Response * r = server.receive_message(client_id);
+//}
 
 int main () { 
   ServerClient server("0.0.0.0", "12345");
@@ -32,7 +68,7 @@ int main () {
     if (client_id == -1) {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
     } else {
-      std::thread (server_message, std::ref(server), client_id).detach(); //do we need to use std::ref?
+      std::thread (proccess_request, std::ref(server), client_id).detach(); //do we need to use std::ref?
     }
     //process request
     //send response

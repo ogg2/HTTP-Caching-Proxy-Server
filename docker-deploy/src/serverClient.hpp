@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 
+#include "request.hpp"
 #include "response.hpp"
 #include "parse.hpp"
 
@@ -116,7 +117,7 @@ public:
 
   //make_response() and forward to client socket 0.0.0.0 12345
   //close
-  Response * receive_message(int client_connection_fd) {
+  Response * receive_response(int client_connection_fd) {
     Response * response = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
@@ -128,7 +129,7 @@ public:
       if (bytes == -1) { std::cerr << "error ahhh" << std::endl; }
       if (bytes < buffer_size) { buffer.resize(bytes); }
 
-      if (response == NULL) {
+      if (response == nullptr) {
         response = parse_response(buffer);
 	check = format_chunk(response, true, buffer);
       } else {
@@ -149,15 +150,60 @@ public:
     return response;
   }
 
-  Response * client_receive() {
-    return receive_message(socket_fd);
+
+  Request * receive_request(int fd) {
+    Request * request = nullptr;
+    ssize_t buffer_size = 1024;
+    std::vector<char> buffer(buffer_size);
+    ssize_t bytes = 0;
+
+    do {
+      bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
+      
+      if (bytes == -1) { std::cerr << "error ahhh" << std::endl; }
+      if (bytes < buffer_size) { buffer.resize(bytes); }
+
+      if (request == nullptr) {
+        request = parse_request(buffer);
+      } else {
+        request->append_body(buffer);
+      }
+
+      buffer.resize(buffer_size);
+
+      if (request->content_length() == -1) { break; }
+
+    } while ((request->body_length() < request->content_length()));
+
+    /*std::ofstream myfile;
+    myfile.open ("log.txt");
+    myfile << "Server received: " << buffer << std::endl;
+    myfile.close();*/
+
+    return request;
   }
 
-  bool send_message(std::vector<char> message) {
+  Response * client_receive() {
+    return receive_response(socket_fd);
+  }
+
+  bool send_request(std::vector<char> message) {
     std::string buffer_string = std::string(message.begin(), message.end()); 
     const char * buffer = buffer_string.c_str();
 
     ssize_t status = send(socket_fd, buffer, message.size(), 0);    
+    if (status == -1) {
+      std::cerr << "Error: could not send message on socket" << std::endl;
+      return false;
+    }
+    return true;
+  }
+
+  bool send_response(std::vector<char> message, int fd) {
+    std::string buffer_string = std::string(message.begin(), message.end()); 
+    const char * buffer = buffer_string.c_str();
+
+    ssize_t status = send(fd, buffer, message.size(), 0);    
     if (status == -1) {
       std::cerr << "Error: could not send message on socket" << std::endl;
       return false;
