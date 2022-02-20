@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <algorithm>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -46,6 +48,128 @@ REQ_TYPES enum_req_type(string req_type) {
   }
   return ELSE;
 }
+
+
+map<string, string> process_footers(vector<char> buffer) {
+
+  vector<char>::const_iterator h = buffer.begin();
+  vector<char>::const_iterator t = h;
+  vector<char>::const_iterator end = buffer.end();
+
+  map<string, string> headers;
+  while ((h != end) && (*h != '\r')) {
+    if (*h == '\n') { break; }
+    while ((t != end) && (*t != '\r')) {
+      if (*t == '\n') { break; }
+      ++t;
+    }
+    if (string(h, t).find(':') == string::npos) { break; }
+    vector<char>::const_iterator v = h;
+    while ((v != t) && (*v != ':')) { ++v; }
+    string header_key(h, v);
+    ++v;
+    while ((v != t) && ((*v == ' ') || (*v == '\t'))) { ++v; }
+    string header_val(v, t);
+
+    headers.insert({header_key, header_val});
+
+    if (t == end) { break; }
+    if (*t == '\r') {
+      t += 2;
+      h = t;
+    }
+    if (*t == '\n') {
+      t += 1;
+      h = t;
+    }
+
+    if ((*h == ' ') || (*h == '\t')) {
+      while ((t != end) && (*t != '\r')) {
+	if (*t == '\n') { break; }
+	++t;
+      }
+      while ((h != t) && ((*h == ' ') || (*h == '\t'))) {
+	++h;
+      }
+      string prev_val = headers.find(header_key)->second;
+      headers.erase(header_key);
+      headers.insert({header_key, prev_val + string(h, t)});
+    }
+
+    if (t == end) { break; }
+    if (*t == '\r') {
+      t += 2;
+      h = t;
+    }
+    if (*t == '\n') {
+      t += 1;
+      h = t;
+    }
+    
+  }
+
+  return headers;
+}
+
+
+int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
+    if (!r->check_chunked_encoding()) { return -1; }
+
+    if (first_chunk) { buffer = r->get_body(); }
+
+    vector<char>::const_iterator h = buffer.begin();
+    vector<char>::const_iterator t = h;
+    vector<char>::const_iterator end = buffer.end();
+
+    vector<char> temp;
+    int hex_val = 0;
+
+    while ((t != end) && (*t != ';')) {
+      if (*t == '\r') {  break; }
+      if (*t == '\n') {  break; }
+      ++t;
+    }
+    string hex_str(h, t);
+    
+    try {
+      hex_val = stoi(hex_str, 0, 16);
+    }
+    catch (invalid_argument ia) {
+      cerr << "Invalid Argument: " << ia.what() << endl;
+      return -1;
+    }
+	   
+    while ((t != end) && (*t != '\n')) { ++t; }
+    ++t;
+    h = t;
+    for (int i = 0; i < hex_val; i++) {
+      if (t == end) { break; }
+      ++t;
+    }
+    copy(h, t, back_inserter(temp));
+
+    while ((t != end) && (*t != '\r')) {
+      if (*t == '\n') { break; }
+      ++t;
+    }
+    ++t;
+    if (*t == '\n') { ++t; }
+    h = t;
+
+    if (first_chunk) {
+      r->replace_body(temp);
+    }
+    else {
+      r->append_body(temp);
+    }
+
+    if (hex_val == 0) {
+      map<string, string> footers = process_footers(vector<char>(h, end));
+      r->add_header(footers);
+    }
+    
+    return hex_val;
+  }
 
 
 Request * parse_request(const vector<char> req) {
@@ -128,7 +252,6 @@ Request * parse_request(const vector<char> req) {
       t += 1;
       h = t;
     }
-    
   }
 
   if (*h == '\r') {
@@ -219,8 +342,7 @@ Response * parse_response(const vector<char> resp) {
     if (*t == '\n') {
       t += 1;
       h = t;
-    }
-    
+    } 
   }
 
   if (*h == '\r') {

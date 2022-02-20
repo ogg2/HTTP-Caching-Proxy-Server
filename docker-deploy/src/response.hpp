@@ -83,6 +83,10 @@ public:
     copy(text.begin(), text.end(), back_inserter(body));
   }
 
+  void replace_body(vector<char> text) {
+    swap(text, body);
+  }
+
   bool check_chunked_encoding() {
     map<string, string>::iterator it = headers.find("Transfer-Encoding");
     if (it == headers.end()) { return false; }
@@ -96,12 +100,20 @@ public:
     return stoi(it->second);
   }
   
-  void add_header_field(string key, string val) {
+  void add_header(string key, string val) {
     headers.insert({key, val});
+  }
+
+  void add_header(map<string, string> map) {
+    headers.insert(map.begin(), map.end());
   }
 
   ssize_t body_length() {
     return body.size();
+  }
+
+  vector<char> get_body() {
+    return body;
   }
 
 };

@@ -120,6 +120,7 @@ public:
     Response * response = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
+    int check = 1;
     do {
       ssize_t bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
 
@@ -135,13 +136,19 @@ public:
       //std::vector<char> buffer_vector;
       //buffer_vector.insert(buffer_vector.end(), buffer, buffer+bytes);
 
+      //std::cout << "buffer:\n" << string(buffer.begin(), buffer.end()) << std::endl;
+
       if (response == NULL) {
         response = parse_response(buffer);
+	check = format_chunk(response, true, buffer);
       } else {
-        response->append_body(buffer);
+	check = format_chunk(response, true, buffer);
+	if (check == -1) { response->append_body(buffer); }
       }
 
-    } while (response->body_length() < response->content_length());
+      buffer.resize(buffer_size);
+
+    } while ((response->body_length() < response->content_length()) || (check > 0));
 
     /*std::ofstream myfile;
     myfile.open ("log.txt");
