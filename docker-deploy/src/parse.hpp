@@ -6,7 +6,7 @@
 
 size_t find_nth_char(string s, char c, int n);
 
-vector<string> split_url(string url);
+vector<string> split_url(vector<char> url);
 
 REQ_TYPES enum_req_type(string req_type);
 

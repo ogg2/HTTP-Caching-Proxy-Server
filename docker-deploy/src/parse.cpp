@@ -23,63 +23,65 @@ size_t find_nth_char(string s, char c, int n) {
 }
 
 
-vector<string> split_url(string url) {
-  size_t host_loc = url.find("://");
-  int n_colon = 2;
-  int n_slash = 3;
+vector<string> split_url(vector<char> url) {
+  vector<char>::const_iterator h = url.begin();
+  vector<char>::const_iterator t = h;
+  vector<char>::const_iterator end = url.end();
 
-  size_t host_start = 0;
-  size_t host_length;
-  size_t port_start;
-  size_t port_length;
-  
-  if (host_loc == string::npos) {
-    n_slash = 1;
-    n_colon = 1;
+  vector<char>::const_iterator host_start = h;
+  vector<char>::const_iterator host_end = end;
+
+  vector<char>::const_iterator port_start = end;
+  vector<char>::const_iterator port_end = end;
+
+  vector<char>::const_iterator path_start = end;
+  vector<char>::const_iterator path_end = end;
+
+
+  while ((t != end) && (*t != ':')) { ++t; }
+  if ((*(t + 1) == '/') && (*(t + 2) == '/')) {
+    t += 3;
+    h = t;
+    host_start = h;
+    while ((t != end) && (*t != ':') && (*t != '/')) { ++t; }
+    host_end = t;
+    if (*t == ':') {	
+      ++t;
+      h = t;
+      while ((t != end) && (*t != '/')) { ++t; }
+      port_start = h;
+      if (*t == '/') {
+	port_end = t;
+	path_start = t;
+      }
+    }
+    else if (t != end) { path_start = t; }
   }
-  else if (url.at(host_loc+1) == '/') {
-    host_start = host_loc + 3;
+  else if (t != end) {
+    host_end = t;
+    ++t;
+    h = t;
+    while ((t != end) && (*t != '/')) { ++t; }
+    port_start = h;
+    port_end = t;
+    if (t != end) { path_start = t; }
   }
 
-  cout << "host_start: " << host_start << endl;
-
-  size_t path_loc = find_nth_char(url, '/', n_slash);
-  cout << "path_loc: " << path_loc << endl;
-  size_t port_loc = find_nth_char(url, ':', n_colon);
-  cout << "port_loc: " << port_loc << endl;
-
-
-  if (port_loc != string::npos) {
-    host_length = port_loc - host_start;
-  }
-  else {
-    host_length = path_loc - host_start;
-  }
-
-  string hostname = url.substr(host_start, host_length);
-
-  if (path_loc == string::npos) { path_loc = url.length() - 1; }
-  string pathname = url.substr(path_loc);
+  string hostname(host_start, host_end);
+  string port(port_start, port_end);
+  string pathname(path_start, path_end);
 
   vector<string> ret;
   ret.push_back(hostname);
   ret.push_back(pathname);
+  ret.push_back(port);
 
+  /*
   cout << "split_url.hostname: " << hostname << endl;
   cout << "split_url.pathname: " << pathname << endl;
-
-  if (port_loc != string::npos) {
-    port_start = port_loc + 1;
-    port_length = path_loc - port_start;
-    ret.push_back(url.substr(port_start, port_length));
-    cout << "split_url.port: " << url.substr(port_start, port_length) << endl;
-  }
-  else {
-    ret.push_back("");
-  }
-  
+  cout << "split_url.port: " << port << endl;
+  */
   return ret;
-
 }
 
 
@@ -232,19 +234,14 @@ Request * parse_request(const vector<char> req) {
   ++t;
   h = t;
 
-  cout << string(req.begin(), req.end());
-  cout << "PRINT MARKER" << endl;
-  while ((t != end) && (*t != ' ')) { 
-    cout << "T: " << *t << endl;
-    ++t; 
-  }
-  string url(h, t);
-  cout << "url: " << url << endl;
+  while ((t != end) && (*t != ' ')) { ++t; }
+  vector<char> url;
+  copy(h, t, back_inserter(url));
   vector<string> temp = split_url(url);
   string hostname = temp[0];
   string resource = temp[1];
   string port = temp[2];
-
+  
   ++t;
   h = t;
 

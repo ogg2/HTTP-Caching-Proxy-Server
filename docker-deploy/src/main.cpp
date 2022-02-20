@@ -31,6 +31,9 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   bool is_server = false;
   const char * hostname = request->get_hostname();
   const char * port = "80";
+
+  std::cout << "1.5. got hostname\n";
+  
   
   ServerClient client(hostname, port);
   int status = client.initialize_socket(is_server);
