@@ -188,6 +188,7 @@ Request * parse_request(const vector<char> req) {
 
   while ((t != end) && (*t != ' ')) { ++t; }
   string url(h, t);
+  std::cout << "url: " << url << std::endl;
   vector<string> temp = split_url(url);
   string hostname = temp[0];
   string resource = temp[1];
