@@ -45,7 +45,7 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   }
 
   //std::cout << "2. created socket\n"; 
-  if (!client.send_request(request->make_get_req())) { return; }
+  if (!client.send_request(request->make_request())) { return; }
 
   std::cout << "3. sent request\n"; 
 

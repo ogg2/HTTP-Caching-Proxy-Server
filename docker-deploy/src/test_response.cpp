@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
 
   std::vector<char> buffer = readFile(argv[1]);
   Request * request = parse_request(buffer);
-  std::vector<char> new_request = request->make_get_req();  
+  std::vector<char> new_request = request->make_request();  
   std::cout << string(new_request.begin(), new_request.end()) << std::endl;
 
   client.send_request(new_request);

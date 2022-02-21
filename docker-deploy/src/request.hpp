@@ -63,8 +63,22 @@ public:
     cout << endl << string(body.begin(), body.end()) << endl;
   }
 
-  vector<char> make_get_req() {
-    string req_ty = "GET";
+  vector<char> make_request() {
+    string req_ty;
+    switch (req_type) {
+    case GET:
+      req_ty = "GET";
+      break;
+    case POST:
+      req_ty = "POST";
+      break;
+    case CONNECT:
+      req_ty = "CONNECT";
+      break;
+    default:
+      req_ty = "BREAK";
+      break;
+    }
     vector<char> buffer;
 
     // first line
@@ -95,6 +109,7 @@ public:
 
     return buffer;
   }
+  
 
   ssize_t content_length() {
     map<string, string>::iterator it = headers.find("Content-Length");

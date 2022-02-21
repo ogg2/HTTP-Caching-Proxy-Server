@@ -26,7 +26,7 @@ int main(int argc, char ** argv) {
   std::vector<char> buffer = readFile(argv[1]);
   Request * r = parse_request(buffer);
   r->print();
-  std::vector<char> new_req = r->make_get_req();
+  std::vector<char> new_req = r->make_request();
   std::cout << string(new_req.begin(), new_req.end()) << std::endl;
   
   return EXIT_SUCCESS;
