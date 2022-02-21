@@ -26,15 +26,9 @@ vector<string> split_url(vector<char> url) {
   vector<char>::const_iterator t = h;
   vector<char>::const_iterator end = url.end();
 
-  vector<char>::const_iterator host_start = h;
-  vector<char>::const_iterator host_end = end;
-
-  vector<char>::const_iterator port_start = end;
-  vector<char>::const_iterator port_end = end;
-
-  vector<char>::const_iterator path_start = end;
-  vector<char>::const_iterator path_end = end;
-
+  vector<char>::const_iterator host_start = h, host_end = end;
+  vector<char>::const_iterator port_start = end, port_end = end;
+  vector<char>::const_iterator path_start = end, path_end = end;
 
   while ((t != end) && (*t != ':')) { ++t; }
   if ((*(t + 1) == '/') && (*(t + 2) == '/')) {
@@ -65,19 +59,10 @@ vector<string> split_url(vector<char> url) {
     if (t != end) { path_start = t; }
   }
 
-  string hostname(host_start, host_end);
-  string port(port_start, port_end);
-  string pathname(path_start, path_end);
-
   vector<string> ret;
-  ret.push_back(hostname);
-  ret.push_back(pathname);
-  ret.push_back(port);
-
-  cout << "split_url.hostname: " << hostname << endl;
-  cout << "split_url.pathname: " << pathname << endl;
-  cout << "split_url.port: " << port << endl;
-  
+  ret.push_back(string(host_start, host_end));
+  ret.push_back(string(path_start, path_end));
+  ret.push_back(string(port_start, port_end));
   return ret;
 }
 
@@ -156,6 +141,8 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
 
     if (first_chunk) { buffer = r->get_body(); }
 
+    cout << string(buffer.begin(), buffer.end()) << endl;
+    
     vector<char>::const_iterator h = buffer.begin();
     vector<char>::const_iterator t = h;
     vector<char>::const_iterator end = buffer.end();
@@ -170,7 +157,7 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
       hex_val = stoi(hex_str, 0, 16);
     }
     catch (invalid_argument & ia) {
-      cerr << "Invalid Argument: " << ia.what() << endl;
+      cerr << "Invalid Argument: " << ia.what() << " Hex String: " << hex_str << endl;
       return -1;
     }
 	   

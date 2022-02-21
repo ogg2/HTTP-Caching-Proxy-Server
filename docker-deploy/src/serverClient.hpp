@@ -113,17 +113,8 @@ public:
     return client_connection_fd;
   }
 
-  //recv message
-  //Response r = parse_response() return this object
-  //recv while loop to get entire response 
 
-  // append_body() text in Response class - Adam
-  // check_chunked_encoding()
-  // content_length()
-
-  //make_response() and forward to client socket 0.0.0.0 12345
-  //close
-  Response * receive_response(int client_connection_fd) {
+  Response * receive_response(int fd) {
     Response * response = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
@@ -137,24 +128,25 @@ public:
     */
     
     do {
-      bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
+      bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
       
-      if (bytes == -1) { std::cerr << "error ahhh" << std::endl; break; }
+      if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; break; }
       if (bytes == 0) { break; }
       if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (response == nullptr) {
         response = parse_response(buffer);
-	      check = format_chunk(response, true, buffer);
+	check = format_chunk(response, true, buffer);
       } else {
-	      check = format_chunk(response, true, buffer);
-	      if (check == -1) { response->append_body(buffer); }
+	check = format_chunk(response, false, buffer);
+	if (check == -1) { response->append_body(buffer); }
       }
 
       buffer.resize(buffer_size);
 
     } while ((response->body_length() < response->content_length())
-	     || (check > 0));
+	     || (check > 0)
+	     || (bytes > 0));
 
     /*std::ofstream myfile;
     myfile.open ("log.txt");
