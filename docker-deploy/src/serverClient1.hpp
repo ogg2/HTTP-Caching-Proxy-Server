@@ -114,41 +114,70 @@ public:
   }
 
   Response * receive_response(int fd) {
+    Response * response = nullptr
+
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
     ssize_t num_bytes;
     size_t index = 0;
-
+  
+    bool chunked = false;
+    
     while ((num_bytes = recv(fd, &buffer.data()[index], buffer_size, 0 )) > 0) {
+      std::cout << num_bytes << std::endl;
+      //std::cout << string(buffer.begin(), buffer.end()) << std::endl;
+      
       if (num_bytes == -1) {
 	std::cerr << "num_bytes = -1 for " << fd << std::endl;
 	return nullptr;
       }
+      if (response == nullptr) {
+        response = parse_response(vector<char>(buffer.begin(), buffer.() + num_bytes));
+	if (temp->is_chunked()) { chunked = true; }
+      }
+
+      if (chunked) {
+	
+      }
+
       index += num_bytes;
       if (buffer.size() < index + buffer_size) { buffer.resize(index + buffer_size); }
     }
 
-    Response * response = parse_response(vector<char>(buffer.begin(), buffer.begin() + index));
+    std::cout << "made it\n";
+    
     return response;
   }
 
 
   Request * receive_request(int fd) {
+    Request * request = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
-    ssize_t num_bytes;
-    size_t index = 0;
+    ssize_t num_bytes = 0;
 
-    while ((num_bytes = recv(fd, &buffer.data()[index], buffer_size, 0 )) > 0) {
+    do {
+      num_bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
+
+      std::cout << string(buffer.begin(), buffer.end()) << std::endl;
+      
       if (num_bytes == -1) {
 	std::cerr << "num_bytes = -1 for " << fd << std::endl;
 	return nullptr;
       }
-      index += num_bytes;
-      if (buffer.size() < index + buffer_size) { buffer.resize(index + buffer_size); }
-    }
+      if (num_bytes == 0) { break; }
+      if (num_bytes < buffer_size) { buffer.resize(num_bytes); }
 
-    Request * request = parse_request(vector<char>(buffer.begin(), buffer.begin() + index));
+      if (request == nullptr) {
+        request = parse_request(buffer);
+      } else {
+        request->append_body(buffer);
+      }
+
+      buffer.resize(buffer_size);
+      if (request->content_length() == -1) { break; }
+
+    } while ((request->body_length() < request->content_length()));
 
     /*std::ofstream myfile;
     myfile.open ("log.txt");

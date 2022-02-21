@@ -113,22 +113,54 @@ public:
     return client_connection_fd;
   }
 
-  Response * receive_response(int fd) {
+  //recv message
+  //Response r = parse_response() return this object
+  //recv while loop to get entire response 
+
+  // append_body() text in Response class - Adam
+  // check_chunked_encoding()
+  // content_length()
+
+  //make_response() and forward to client socket 0.0.0.0 12345
+  //close
+  Response * receive_response(int client_connection_fd) {
+    Response * response = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
-    ssize_t num_bytes;
-    size_t index = 0;
-    
-    while ((num_bytes = recv(fd, &buffer.data()[index], buffer_size, 0 )) > 0) {
-      if (num_bytes == -1) {
-	std::cerr << "num_bytes = -1 for " << fd << std::endl;
-	return nullptr;
-      }
-      index += num_bytes;
-      if (buffer.size() < index + buffer_size) { buffer.resize(index + buffer_size); }
+    int check = 1;
+    ssize_t bytes = 0;
+
+    /*
+    while ((num_of_bytes = recv( c_socket, memblock, file_buf, 0 )) > 0) {
+        dest.write(memblock,num_of_bytes);
     }
+    */
     
-    Response * response = parse_response(vector<char>(buffer.begin(), buffer.begin() + index));
+    do {
+      bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
+      
+      if (bytes == -1) { std::cerr << "error ahhh" << std::endl; break; }
+      if (bytes == 0) { break; }
+      if (bytes < buffer_size) { buffer.resize(bytes); }
+
+      if (response == nullptr) {
+        response = parse_response(buffer);
+	      check = format_chunk(response, true, buffer);
+      } else {
+	      check = format_chunk(response, true, buffer);
+	      if (check == -1) { response->append_body(buffer); }
+      }
+
+      buffer.resize(buffer_size);
+
+    } while ((response->body_length() < response->content_length())
+	     || (check > 0));
+
+    /*std::ofstream myfile;
+    myfile.open ("log.txt");
+    myfile << "Server received: " << buffer << std::endl;
+    myfile.close();*/
+
     return response;
   }
 
@@ -137,26 +169,30 @@ public:
     Request * request = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
-    ssize_t num_bytes = 0;
+    ssize_t bytes = 0;
 
     do {
-      num_bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
+      bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
+
+      //std::cout << fd << " recv\n";
       
-      if (num_bytes == -1) {
-	std::cerr << "num_bytes = -1 for " << fd << std::endl;
-	return nullptr;
-      }
-      if (num_bytes == 0) { break; }
-      if (num_bytes < buffer_size) { buffer.resize(num_bytes); }
+      if (bytes == -1) { std::cerr << "error ahhh" << std::endl; break; }
+      if (bytes == 0) { break; }
+      if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (request == nullptr) {
         request = parse_request(buffer);
+	//std::cout << fd << "parse\n";
       } else {
         request->append_body(buffer);
+	//std::cout << fd << "append\n";
       }
 
       buffer.resize(buffer_size);
+
       if (request->content_length() == -1) { break; }
+
+      //std::cout << fd << "before while check\n";
 
     } while ((request->body_length() < request->content_length()));
 

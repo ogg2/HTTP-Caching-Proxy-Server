@@ -86,18 +86,18 @@ public:
   void replace_body(vector<char> text) {
     swap(text, body);
   }
-
-  bool check_chunked_encoding() {
-    map<string, string>::iterator it = headers.find("Transfer-Encoding");
-    if (it == headers.end()) { return false; }
-    if (it->second.compare("chunked") == 0) { return true; }
-    return false;
-  }
   
   ssize_t content_length() {
     map<string, string>::iterator it = headers.find("Content-Length");
     if (it == headers.end()) { return -1; }
     return stoi(it->second);
+  }
+
+  bool is_chunked() {
+    map<string, string>::iterator it = headers.find("Transfer-Encoding");
+    if (it == headers.end()) { return false; }
+    if (it->second.compare("chunked") == 0) { return true; }
+    return false;
   }
   
   void add_header(string key, string val) {
