@@ -177,61 +177,6 @@ int parse_chunk(vector<char>& buffer) {
 }
 
 
-int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
-    if (!r->is_chunked()) { return -1; }
-
-    if (first_chunk) { buffer = r->get_body(); }
-    
-    vector<char>::const_iterator h = buffer.begin();
-    vector<char>::const_iterator t = h;
-    vector<char>::const_iterator end = buffer.end();
-
-    vector<char> temp;
-    int hex_val = 0;
-
-    while ((t != end) && (*t != ';') && (*t != '\r') && (*t != '\n')) { ++t; }
-    vector<char> hex_vect(h, t);
-    hex_vect.push_back('\0');
-    char * hex_str = &hex_vect[0];
-    
-    try {
-      hex_val = stoi(hex_str, 0, 16);
-    }
-    catch (invalid_argument & ia) {
-      cerr << "Invalid Argument: " << ia.what() << endl;
-      return -1;
-    }
-	   
-    while ((t != end) && (*t != '\n')) { ++t; }
-    if (t != end) { ++t; }
-    h = t;
-    for (int i = 0; i < hex_val; i++) {
-      if (t == end) { break; }
-      ++t;
-    }
-    copy(h, t, back_inserter(temp));
-
-    while ((t != end) && (*t != '\r') && (*t == '\n')) { ++t; }
-    if (t != end) { ++t; }
-    if ((t != end) && (*t == '\n')) { ++t; }
-    h = t;
-
-    if (first_chunk) {
-      r->update_body(temp);
-    }
-    else {
-      r->append_body(temp);
-    }
-
-    if (hex_val == 0) {
-      map<string, string> footers = process_footers(vector<char>(h, end));
-      r->add_header(footers);
-    }
-    
-    return hex_val;
-  }
-
-
 Request * parse_request(const vector<char> req) {
   //cout << "request in parse:\n" << string(req.begin(), req.end()) << endl;
 
@@ -296,7 +241,7 @@ Request * parse_request(const vector<char> req) {
     if ((h == end) || (t == end)) { break; }
 
     if ((*h == ' ') || (*h == '\t')) {
-      while ((t != end) && (*t != '\r') && (*t == '\n')) { ++t; }
+      while ((t != end) && (*t != '\r') && (*t != '\n')) { ++t; }
       while ((h != end) && (h != t) && ((*h == ' ') || (*h == '\t'))) { ++h; }
       string prev_val = headers.find(header_key)->second;
       headers.erase(header_key);
@@ -375,23 +320,23 @@ Response * parse_response(const vector<char> resp) {
     headers.insert({header_key, header_val});
 
     if (t == end) { break; }
-    if (*t == '\r') {
-      t += 2;
-      h = t;
-    }
+    if (*t == '\r') { ++t; }
     else if (*t == '\n') {
-      t += 1;
+      ++t;
       h = t;
     }
 
     if ((*h == ' ') || (*h == '\t')) {
-      while ((t != end) && (*t != '\r') && (*t == '\n')) { ++t; }
+      while ((t != end) && (*t != '\r') && (*t != '\n')) { ++t; }
       while ((h != t) && ((*h == ' ') || (*h == '\t'))) { ++h; }
       string prev_val = headers.find(header_key)->second;
       headers.erase(header_key);
       headers.insert({header_key, prev_val + string(h, t)});
 
-      if ((t != end) && (*t == '\r')) { ++t; }
+      if ((t != end) && (*t == '\r')) {
+	++t;
+	h = t;
+      }
       if ((t != end) && (*t == '\n')) {
 	++t;
 	h = t;

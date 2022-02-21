@@ -30,21 +30,27 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   const char * hostname = request->get_hostname();
   const char * port = "80";//request->get_port();
   //std::cout << "1.5. got hostname\n";
-  
+
+  std::cout << "Request:\n";
+  request->print();
   
   ServerClient client(hostname, port);
   int status = client.initialize_socket(is_server);
+  std::cout << "status: " << status << std::endl;
   if (status == -1) {
     std::cout << "Failed to setup client" << std::endl;
     client.close_socket();
     return;
   }
-  //std::cout << "2. created socket\n"; 
+  std::cout << "2. created socket\n"; 
 
   /*if (request->get_type() == CONNECT) {
     server.connect_tunnel(fd);
   } else if {*/
-  if (!client.send_request(request->make_request())) { return; }
+  if (!client.send_request(request->make_request())) {
+    client.close_socket();
+    return;
+  }
   //std::cout << "3. sent request\n"; 
 
   //CacheEntry * cachedResponse;

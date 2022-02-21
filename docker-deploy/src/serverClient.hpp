@@ -54,7 +54,7 @@ public:
     int status = getaddrinfo(hostname, port, &host_info, &host_info_list);
     if (status != 0) {
       std::cerr << "Error: cannot get address info for host" << std::endl;
-      std::cerr << "  (" << hostname << "," << port << ")" << std::endl;
+      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -64,7 +64,7 @@ public:
     socket_fd = socket(host_info_list->ai_family, host_info_list->ai_socktype, host_info_list->ai_protocol);
     if (socket_fd == -1) {
       std::cerr << "Error: cannot create socket" << std::endl;
-      std::cerr << "  (" << hostname << "," << port << ")" << std::endl;
+      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -76,7 +76,7 @@ public:
     status = ::bind(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
     if (status == -1) {
       std::cerr << "Error: cannot bind socket" << std::endl;
-      std::cerr << "  (" << hostname << "," << port << ")" << std::endl;
+      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -86,7 +86,7 @@ public:
     int status = listen(socket_fd, 100);
     if (status == -1) {
       std::cerr << "Error: cannot listen on socket" << std::endl; 
-      std::cerr << "  (" << hostname << "," << port << ")" << std::endl;
+      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -96,7 +96,7 @@ public:
     int status = connect(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
     if (status == -1) {
       std::cerr << "Error: cannot connect to socket" << std::endl;
-      std::cerr << "  (" << hostname << "," << port << ")" << std::endl;
+      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
