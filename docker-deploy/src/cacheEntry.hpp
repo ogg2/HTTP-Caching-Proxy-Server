@@ -12,6 +12,7 @@
 class CacheEntry {
 private:
   time_t expiration; //tm_wday, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_year
+  bool never_expires;
   Response * response;
 
   //okay to just have HashMap where key is url string, value is cache object
@@ -21,6 +22,9 @@ private:
   //out of memory then reboot proxy
 
   bool is_fresh() {
+    if (never_expires) {
+      return true;
+    }
     time_t now;
     time (&now);
     double time_to_expiration = difftime(expiration, now);
@@ -28,10 +32,12 @@ private:
   }
 public:
   //max-age is defined in Cache-Control Directives
-  CacheEntry (int max_age) {
+  CacheEntry (Response * r, int max_age) {
     time_t now;
     time (&now); 
     expiration = now + max_age;
+    response = r;
+    never_expires = max_age == 0;
   }
 
   void print_expiration() {
@@ -68,6 +74,9 @@ public:
   //if request directive indicates a max-stale value, client willing to accept
   //response that has exceeded freshness by max_stale seconds
   bool not_too_stale(int max_stale) {
+    if (never_expires) {
+      return true;
+    }
     time_t now;
     time (&now);
     time_t allowable_stale = expiration + max_stale;
@@ -78,6 +87,9 @@ public:
   //if request directive indicates a max-stale value, client requires
   //response will still be fresh for min_fresh more seconds
   bool will_be_fresh(int min_fresh) {
+    if (never_expires) {
+      return true;
+    }
     time_t now;
     time (&now);
     now = now + min_fresh;

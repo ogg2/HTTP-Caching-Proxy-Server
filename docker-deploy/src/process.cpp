@@ -29,7 +29,6 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   bool is_server = false;
   const char * hostname = request->get_hostname();
   const char * port = "80";//request->get_port();
-
   //std::cout << "1.5. got hostname\n";
   
   
@@ -40,10 +39,12 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
     client.close_socket();
     return;
   }
-
   //std::cout << "2. created socket\n"; 
-  if (!client.send_request(request->make_request())) { return; }
 
+  /*if (request->get_type() == CONNECT) {
+    server.connect_tunnel(fd);
+  } else if {*/
+  if (!client.send_request(request->make_request())) { return; }
   //std::cout << "3. sent request\n"; 
 
   //CacheEntry * cachedResponse;

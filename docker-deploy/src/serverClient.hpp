@@ -114,9 +114,9 @@ public:
   }
 
   void connect_tunnel(int client_connection_fd) {
-    struct timeval timeout;
-    timeout.tv_sec = 90; // make longer allow inactive for a bit?
-    timeout.tv_usec = 0;
+    //struct timeval timeout;
+    //timeout.tv_sec = 90; // make longer allow inactive for a bit?
+    //timeout.tv_usec = 0;
 
     fd_set rfds;
     FD_ZERO(&rfds);
@@ -130,7 +130,7 @@ public:
 
     //while (status = select(2, &rfds, NULL, NULL, &timeout) { // loop to keep connection open until closed?
     while (true) {
-      if (select(max_fd + 1, &rfds, NULL, NULL, &timeout) == -1) {
+      if (select(max_fd + 1, &rfds, NULL, NULL, NULL) == -1) {
         std::cerr << "Error: could not CONNECT" << std::endl;
         return;
       }
