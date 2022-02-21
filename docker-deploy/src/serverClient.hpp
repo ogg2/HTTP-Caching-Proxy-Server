@@ -30,8 +30,6 @@ public:
     host_info.ai_family   = AF_UNSPEC;
     host_info.ai_socktype = SOCK_STREAM;
     host_info.ai_flags    = AI_PASSIVE;
-
-    cache = new Cache();
   }
 
   int initialize_socket(bool is_server) {
@@ -139,6 +137,7 @@ public:
       bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0);
       
       if (bytes == -1) { std::cerr << "error ahhh" << std::endl; break; }
+      if (bytes == 0) { break; }
       if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (response == nullptr) {

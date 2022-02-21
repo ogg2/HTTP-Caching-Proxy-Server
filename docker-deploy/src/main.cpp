@@ -31,7 +31,7 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
    
   bool is_server = false;
   const char * hostname = request->get_hostname();
-  const char * port = request->get_port();
+  const char * port = "80";//request->get_port();
 
   //std::cout << "1.5. got hostname\n";
   
@@ -40,6 +40,7 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   int status = client.initialize_socket(is_server);
   if (status == -1) {
     std::cout << "Failed to setup client" << std::endl;
+    client.close_socket();
     return;
   }
 
@@ -48,15 +49,15 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
 
   std::cout << "3. sent request\n"; 
 
-  CacheEntry * cachedResponse;
+  //CacheEntry * cachedResponse;
   Response * response;
-  if ((cachedResponse = server.get_cache()->find_response(request->get_resource())) != nullptr) {
-    std::cout << "Cached Response" << std::endl;
-    response = cachedResponse->get_response();
-  } else {
+  //if ((cachedResponse = server.get_cache()->find_response(request->get_resource())) != nullptr) {
+  //  std::cout << "------Cached Response------" << std::endl;
+  //  response = cachedResponse->get_response();
+  //} else {
     response = client.client_receive();
-  }
-
+  //}
+ 
   std::cout << "4. recieved response:\n";
   
   client.close_socket();
@@ -69,6 +70,8 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   //response->print();
 
   std::vector<char> resp = response->make_response();
+  //TODO CacheEntry entry(); create cache entry
+  //TODO server.get_cache()->add_entry(entry);
   //std::cout << string(resp.begin(), resp.end()) << std::endl;
   server.send_response(resp, fd);
   //std::cout << "5. sent response:\n";

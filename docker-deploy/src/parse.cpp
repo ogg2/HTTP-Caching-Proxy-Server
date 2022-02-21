@@ -281,13 +281,15 @@ Request * parse_request(const vector<char> req) {
       h = t;
     }
 
+    if (h == end) { break; }
+
     if ((*h == ' ') || (*h == '\t')) {
       while ((t != end) && (*t != '\r')) {
-	if (*t == '\n') { break; }
-	++t;
+	      if (*t == '\n') { break; }
+	      ++t;
       }
-      while ((h != t) && ((*h == ' ') || (*h == '\t'))) {
-	++h;
+      while ((h != end) && (h != t) && ((*h == ' ') || (*h == '\t'))) {
+	      ++h;
       }
       string prev_val = headers.find(header_key)->second;
       headers.erase(header_key);
@@ -299,16 +301,17 @@ Request * parse_request(const vector<char> req) {
       t += 2;
       h = t;
     }
+    if (t == end) { break; }
     if (*t == '\n') {
       t += 1;
       h = t;
     }
   }
 
-  if (*h == '\r') {
+  if ((h != end) && (*h == '\r')) {
     ++h;
   }
-  if (*h == '\n') {
+  if ((h != end) && (*h == '\n')) {
     ++h;
   }
   vector<char> body(h, end);
@@ -397,10 +400,10 @@ Response * parse_response(const vector<char> resp) {
     }
   }
 
-  if (*h == '\r') {
+  if ((h != end) && (*h == '\r')) {
     ++h;
   }
-  if (*h == '\n') {
+  if ((h != end) && (*h == '\n')) {
     ++h;
   }
   vector<char> body(h, end);
