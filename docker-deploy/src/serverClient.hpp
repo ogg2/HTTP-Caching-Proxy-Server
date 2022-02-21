@@ -157,6 +157,8 @@ public:
               } else {
                 std::cerr << "Error: cannot receive CONNECT data" << std::endl;
               }
+              close(i);
+              FD_CLR(i, &rfds); //&master?????
             } else {
               for (int j = 0; j <= max_fd; j++) {
                 if (FD_ISSET(j, &rfds)) { //&master??????
