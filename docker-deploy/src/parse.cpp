@@ -123,11 +123,11 @@ map<string, string> process_footers(vector<char> buffer) {
 
     if (t == end) { break; }
     if (*t == '\r') {
-      t += 2;
+      ++t;
       h = t;
     }
-    if (*t == '\n') {
-      t += 1;
+    if ((t != end) && (*t == '\n')) {
+      ++t;
       h = t;
     }
 
@@ -144,13 +144,12 @@ map<string, string> process_footers(vector<char> buffer) {
       headers.insert({header_key, prev_val + string(h, t)});
     }
 
-    if (t == end) { break; }
-    if (*t == '\r') {
-      t += 2;
+    if ((t != end) && (*t == '\r')) {
+      ++t;
       h = t;
     }
-    if (*t == '\n') {
-      t += 1;
+    if ((t != end) && (*t == '\n')) {
+      ++t;
       h = t;
     }
     
@@ -273,37 +272,33 @@ Request * parse_request(const vector<char> req) {
 
     if (t == end) { break; }
     if (*t == '\r') {
-      t += 2;
+      ++t;
       h = t;
     }
-    if (*t == '\n') {
-      t += 1;
+    if ((t != end) && (*t == '\n')) {
+      ++t;
       h = t;
     }
 
-    if (h == end) { break; }
+    if ((h == end) || (t == end)) { break; }
 
     if ((*h == ' ') || (*h == '\t')) {
       while ((t != end) && (*t != '\r')) {
 	      if (*t == '\n') { break; }
 	      ++t;
       }
-      while ((h != end) && (h != t) && ((*h == ' ') || (*h == '\t'))) {
-	      ++h;
-      }
+      while ((h != end) && (h != t) && ((*h == ' ') || (*h == '\t'))) { ++h; }
       string prev_val = headers.find(header_key)->second;
       headers.erase(header_key);
       headers.insert({header_key, prev_val + string(h, t)});
     }
 
-    if (t == end) { break; }
-    if (*t == '\r') {
-      t += 2;
+    if ((t != end) && (*t == '\r')) {
+      ++t;
       h = t;
     }
-    if (t == end) { break; }
-    if (*t == '\n') {
-      t += 1;
+    if ((t != end) && (*t == '\n')) {
+      ++t;
       h = t;
     }
   }
@@ -333,7 +328,15 @@ Response * parse_response(const vector<char> resp) {
   h = t;
 
   while ((t != end) && (*t != ' ')) { ++t; }
-  int status_code = stoi(string(h, t));
+
+  int status_code = 0;
+  try {
+    status_code = stoi(string(h, t));
+  }
+  catch (invalid_argument & ia) {
+    cerr << "Invalid Argument: " << ia.what() << endl;
+    return nullptr;
+  }
 
   ++t;
   h = t;

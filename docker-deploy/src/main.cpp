@@ -54,6 +54,7 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   //if ((cachedResponse = server.get_cache()->find_response(request->get_resource())) != nullptr) {
   //  std::cout << "------Cached Response------" << std::endl;
   //  response = cachedResponse->get_response();
+  //TODO check if cache entry is expired
   //} else {
     response = client.client_receive();
   //}
@@ -70,8 +71,8 @@ void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
   //response->print();
 
   std::vector<char> resp = response->make_response();
-  //TODO CacheEntry entry(); create cache entry
-  //TODO server.get_cache()->add_entry(entry);
+  //TODO CacheEntry entry(response, MAX_AGE); create cache entry
+  //TODO server.get_cache()->add_entry(RESOURCEURL, &entry);
   //std::cout << string(resp.begin(), resp.end()) << std::endl;
   server.send_response(resp, fd);
   //std::cout << "5. sent response:\n";
