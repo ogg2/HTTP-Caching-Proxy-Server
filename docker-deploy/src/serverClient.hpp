@@ -110,16 +110,69 @@ public:
     return client_connection_fd;
   }
 
-  //recv message
-  //Response r = parse_response() return this object
-  //recv while loop to get entire response 
+  void connect_tunnel(int client_connection_fd) {
+    struct timeval timeout;
+    timeout.tv_sec = 90; // make longer allow inactive for a bit?
+    timeout.tv_usec = 0;
 
-  // append_body() text in Response class - Adam
-  // check_chunked_encoding()
-  // content_length()
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    FD_SET(client_connection_fd, &rfds);
+    FD_SET(socket_fd, &rfds);
+    int max_fd = client_connection_fd;
 
-  //make_response() and forward to client socket 0.0.0.0 12345
-  //close
+    ssize_t buffer_size = 1024;
+    std::vector<char> buffer(buffer_size);
+    int bytes;
+
+    //while (status = select(2, &rfds, NULL, NULL, &timeout) { // loop to keep connection open until closed?
+    while (true) {
+      if (select(max_fd + 1, &rfds, NULL, NULL, &timeout) == -1) {
+        std::cerr << "Error: could not CONNECT" << std::endl;
+        return;
+      }
+      int new_fd;
+      for (int i = 0; i <= max_fd; i++) {
+        if (FD_ISSET(i, &rfds)) {
+          if (i == client_connection_fd) {
+            struct sockaddr_storage socket_addr;
+            socklen_t socket_addr_len = sizeof(socket_addr);  
+            new_fd = accept(socket_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
+            if (new_fd == -1) {
+              std::cerr << "Error: cannot accept CONNECTion on socket" << std::endl;
+              return;
+            } else {
+              FD_SET(new_fd, &rfds);
+              if (new_fd > max_fd) {
+                max_fd = new_fd;
+              }
+            }
+          } else {
+            if ((bytes = recv(i, &buffer.data()[0], buffer_size, 0)) <= 0) {
+              if (bytes == 0) {
+                return; //connection closed
+              } else {
+                std::cerr << "Error: cannot receive CONNECT data" << std::endl;
+              }
+            } else {
+              for (int j = 0; j <= max_fd; j++) {
+                if (FD_ISSET(j, &rfds)) { //&master??????
+                  if (j == socket_fd) { //who are we sending this to?
+                    std::string buffer_string = std::string(buffer.begin(), buffer.end());
+                    const char * buffer_char = buffer_string.c_str();
+                    if (send(j, buffer_char, bytes, 0) == -1) {
+                      std::cerr << "Error: cannot send CONNECT data" << std::endl;
+                    }
+                  }
+                }
+              }
+            }
+          } //handle data from client
+        } //new incoming connection
+      } //int i - loop fds
+    } //while loop
+  }
+
   Response * receive_response(int client_connection_fd) {
     Response * response = nullptr;
     ssize_t buffer_size = 1024;
