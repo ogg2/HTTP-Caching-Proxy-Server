@@ -1,26 +1,15 @@
 version: '2'
 
 services:
-  db:
-      image: postgres
+  proxy:
+    build: ./src
+      command: bash -c ./src/run.sh
       volumes:
-            - data-volume:/var/lib/postgresql/data
-  web-init:
-      build: ./web-app
-      command: /code/initserver.sh
-      volumes:
-        - ./web-app:/code
-      depends_on:
-        - db
-  web:
-      build: ./web-app
-      user: nobody
-      command: /code/runserver.sh
-      volumes:
-        - ./web-app:/code
-      expose:
-        - "8000"
-      depends_on:
-        - web-init
+        - data-volume:/var/log/erss
+        - ./src:/code
+      ports:
+        - "12345:12345"
+      tty: true
+
 volumes:
-   data-volume: 
+  data-volume: 

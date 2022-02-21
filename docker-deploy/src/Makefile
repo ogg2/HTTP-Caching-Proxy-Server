@@ -1,6 +1,6 @@
 CPPFLAGS=-std=gnu++11 -pedantic -Wall -Werror -ggdb3 -pthread
 
-all: main-res main-req main test-cache test-response
+all: main-res main-req proxy test-cache test-response
 
 main-res: main-res.cpp parse.cpp    
 	g++ $(CPPFLAGS) -o main-res main-res.cpp parse.cpp    
@@ -8,8 +8,8 @@ main-res: main-res.cpp parse.cpp
 main-req: main-req.cpp parse.cpp    
 	g++ $(CPPFLAGS) -o main-req main-req.cpp parse.cpp    
 
-main: main.cpp
-	g++ $(CPPFLAGS) -o main main.cpp parse.cpp
+proxy: proxy.cpp
+	g++ $(CPPFLAGS) -o main proxy.cpp parse.cpp
 
 #daemon: daemon.cpp daemon.hpp
 #	g++ $(CPPFLAGS) -o daemon daemon.cpp
