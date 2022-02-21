@@ -118,7 +118,7 @@ public:
     std::vector<char> buffer(buffer_size);
     ssize_t num_bytes;
     size_t index = 0;
-    
+
     while ((num_bytes = recv(fd, &buffer.data()[index], buffer_size, 0 )) > 0) {
       if (num_bytes == -1) {
 	std::cerr << "num_bytes = -1 for " << fd << std::endl;
@@ -127,38 +127,28 @@ public:
       index += num_bytes;
       if (buffer.size() < index + buffer_size) { buffer.resize(index + buffer_size); }
     }
-    
+
     Response * response = parse_response(vector<char>(buffer.begin(), buffer.begin() + index));
     return response;
   }
 
 
   Request * receive_request(int fd) {
-    Request * request = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
-    ssize_t num_bytes = 0;
+    ssize_t num_bytes;
+    size_t index = 0;
 
-    do {
-      num_bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
-      
+    while ((num_bytes = recv(fd, &buffer.data()[index], buffer_size, 0 )) > 0) {
       if (num_bytes == -1) {
 	std::cerr << "num_bytes = -1 for " << fd << std::endl;
 	return nullptr;
       }
-      if (num_bytes == 0) { break; }
-      if (num_bytes < buffer_size) { buffer.resize(num_bytes); }
+      index += num_bytes;
+      if (buffer.size() < index + buffer_size) { buffer.resize(index + buffer_size); }
+    }
 
-      if (request == nullptr) {
-        request = parse_request(buffer);
-      } else {
-        request->append_body(buffer);
-      }
-
-      buffer.resize(buffer_size);
-      if (request->content_length() == -1) { break; }
-
-    } while ((request->body_length() < request->content_length()));
+    Request * request = parse_request(vector<char>(buffer.begin(), buffer.begin() + index));
 
     /*std::ofstream myfile;
     myfile.open ("log.txt");

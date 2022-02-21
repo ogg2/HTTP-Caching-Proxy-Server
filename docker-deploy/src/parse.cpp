@@ -14,11 +14,10 @@
 
 using namespace std;
 
+
 size_t find_nth_char(string s, char c, int n) {
   size_t loc = s.find(c, 0);
-  for (int i = 1; i < n; i++) {
-    loc = s.find(c, loc+1);
-  }
+  for (int i = 1; i < n; i++) { loc = s.find(c, loc+1); }
   return loc;
 }
 
@@ -30,13 +29,10 @@ vector<string> split_url(vector<char> url) {
 
   vector<char>::const_iterator host_start = h;
   vector<char>::const_iterator host_end = end;
-
   vector<char>::const_iterator port_start = end;
   vector<char>::const_iterator port_end = end;
-
   vector<char>::const_iterator path_start = end;
   vector<char>::const_iterator path_end = end;
-
 
   while ((t != end) && (*t != ':')) { ++t; }
   if ((*(t + 1) == '/') && (*(t + 2) == '/')) {
@@ -67,39 +63,23 @@ vector<string> split_url(vector<char> url) {
     if (t != end) { path_start = t; }
   }
 
-  string hostname(host_start, host_end);
-  string port(port_start, port_end);
-  string pathname(path_start, path_end);
-
   vector<string> ret;
-  ret.push_back(hostname);
-  ret.push_back(pathname);
-  ret.push_back(port);
-
-  cout << "split_url.hostname: " << hostname << endl;
-  cout << "split_url.pathname: " << pathname << endl;
-  cout << "split_url.port: " << port << endl;
-  
+  ret.push_back(string(host_start, host_end));
+  ret.push_back(string(path_start, path_end));
+  ret.push_back(string(port_start, port_end));
   return ret;
 }
 
 
 REQ_TYPES enum_req_type(string req_type) {
-  if (req_type.compare("GET") == 0) {
-    return GET;
-  }
-  if (req_type.compare("POST") == 0) {
-    return POST;
-  }
-  if (req_type.compare("CONNECT") == 0) {
-    return CONNECT;
-  }
+  if (req_type.compare("GET") == 0) { return GET; }
+  if (req_type.compare("POST") == 0) { return POST; }
+  if (req_type.compare("CONNECT") == 0) { return CONNECT; }
   return ELSE;
 }
 
 
 map<string, string> process_footers(vector<char> buffer) {
-
   vector<char>::const_iterator h = buffer.begin();
   vector<char>::const_iterator t = h;
   vector<char>::const_iterator end = buffer.end();
@@ -151,18 +131,16 @@ map<string, string> process_footers(vector<char> buffer) {
     if ((t != end) && (*t == '\n')) {
       ++t;
       h = t;
-    }
-    
+    } 
   }
-
   return headers;
 }
 
 
 int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
-    if (!r->check_chunked_encoding()) { return -1; }
+  //if (!r->check_chunked_encoding()) { return -1; }
 
-    if (first_chunk) { buffer = r->get_body(); }
+  //if (first_chunk) { buffer = r->get_body(); }
 
     vector<char>::const_iterator h = buffer.begin();
     vector<char>::const_iterator t = h;
