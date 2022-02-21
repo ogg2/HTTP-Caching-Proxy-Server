@@ -16,9 +16,7 @@ using namespace std;
 
 size_t find_nth_char(string s, char c, int n) {
   size_t loc = s.find(c, 0);
-  for (int i = 1; i < n; i++) {
-    loc = s.find(c, loc+1);
-  }
+  for (int i = 1; i < n; i++) { loc = s.find(c, loc+1); }
   return loc;
 }
 
@@ -85,15 +83,9 @@ vector<string> split_url(vector<char> url) {
 
 
 REQ_TYPES enum_req_type(string req_type) {
-  if (req_type.compare("GET") == 0) {
-    return GET;
-  }
-  if (req_type.compare("POST") == 0) {
-    return POST;
-  }
-  if (req_type.compare("CONNECT") == 0) {
-    return CONNECT;
-  }
+  if (req_type.compare("GET") == 0) { return GET; }
+  if (req_type.compare("POST") == 0) { return POST; }
+  if (req_type.compare("CONNECT") == 0) { return CONNECT; }
   return ELSE;
 }
 
@@ -160,7 +152,7 @@ map<string, string> process_footers(vector<char> buffer) {
 
 
 int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
-    if (!r->check_chunked_encoding()) { return -1; }
+    if (!r->is_chunked()) { return -1; }
 
     if (first_chunk) { buffer = r->get_body(); }
 
@@ -171,11 +163,7 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
     vector<char> temp;
     int hex_val = 0;
 
-    while ((t != end) && (*t != ';')) {
-      if (*t == '\r') {  break; }
-      if (*t == '\n') {  break; }
-      ++t;
-    }
+    while ((t != end) && (*t != ';') && (*t == '\r') && (*t == '\n')) { ++t; }
     string hex_str(h, t);
     
     try {
@@ -187,7 +175,7 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
     }
 	   
     while ((t != end) && (*t != '\n')) { ++t; }
-    ++t;
+    if (t != end) { ++t; }
     h = t;
     for (int i = 0; i < hex_val; i++) {
       if (t == end) { break; }
@@ -195,12 +183,9 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
     }
     copy(h, t, back_inserter(temp));
 
-    while ((t != end) && (*t != '\r')) {
-      if (*t == '\n') { break; }
-      ++t;
-    }
-    ++t;
-    if (*t == '\n') { ++t; }
+    while ((t != end) && (*t != '\r') && (*t == '\n')) { ++t; }
+    if (t != end) { ++t; }
+    if ((t != end) && (*t == '\n')) { ++t; }
     h = t;
 
     if (first_chunk) {
@@ -283,10 +268,7 @@ Request * parse_request(const vector<char> req) {
     if ((h == end) || (t == end)) { break; }
 
     if ((*h == ' ') || (*h == '\t')) {
-      while ((t != end) && (*t != '\r')) {
-	      if (*t == '\n') { break; }
-	      ++t;
-      }
+      while ((t != end) && (*t != '\r') && (*t == '\n')) { ++t; }
       while ((h != end) && (h != t) && ((*h == ' ') || (*h == '\t'))) { ++h; }
       string prev_val = headers.find(header_key)->second;
       headers.erase(header_key);
@@ -303,12 +285,8 @@ Request * parse_request(const vector<char> req) {
     }
   }
 
-  if ((h != end) && (*h == '\r')) {
-    ++h;
-  }
-  if ((h != end) && (*h == '\n')) {
-    ++h;
-  }
+  if ((h != end) && (*h == '\r')) { ++h; }
+  if ((h != end) && (*h == '\n')) { ++h; }
   vector<char> body(h, end);
 
   return new Request(req_type, hostname, port, resource, version, headers, body);
@@ -379,36 +357,22 @@ Response * parse_response(const vector<char> resp) {
     }
 
     if ((*h == ' ') || (*h == '\t')) {
-      while ((t != end) && (*t != '\r')) {
-	if (*t == '\n') { break; }
-	++t;
-      }
-      while ((h != t) && ((*h == ' ') || (*h == '\t'))) {
-	++h;
-      }
+      while ((t != end) && (*t != '\r') && (*t == '\n')) { ++t; }
+      while ((h != t) && ((*h == ' ') || (*h == '\t'))) { ++h; }
       string prev_val = headers.find(header_key)->second;
       headers.erase(header_key);
       headers.insert({header_key, prev_val + string(h, t)});
 
-      
-      if (t == end) { break; }
-      if (*t == '\r') {
-	t += 2;
-	h = t;
-      }
-      else if (*t == '\n') {
-	t += 1;
+      if ((t != end) && (*t == '\r')) { ++t; }
+      if ((t != end) && (*t == '\n')) {
+	++t;
 	h = t;
       } 
     }
   }
 
-  if ((h != end) && (*h == '\r')) {
-    ++h;
-  }
-  if ((h != end) && (*h == '\n')) {
-    ++h;
-  }
+  if ((h != end) && (*h == '\r')) { ++h; }
+  if ((h != end) && (*h == '\n')) { ++h; }
   vector<char> body(h, end);
 
   return new Response(status_code, reason_phrase, headers, body);
