@@ -176,11 +176,77 @@ public:
     } //while loop
   }
 
+
+  void recieve_chunked(Response * r, int fd) {
+    ssize_t buffer_size = 1024;
+    ssize_t bytes = 0;
+    int length = 0;
+
+    vector<char> buffer = r->get_body();
+    int chunk_size = parse_chunk(buffer);
+    if (chunk_size == -1) {
+      std::cerr << "Invalid response from " << fd << std::endl;
+      return;
+    }
+    length += chunk_size;
+    if (chunk_size - buffer.size()) {
+      std::vector<char> temp(buffer_size);
+      bytes = recv(fd, &temp.data()[0], buffer_size, 0);
+      if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; return; }
+      if (bytes == 0) { return; }
+      if (bytes < buffer_size) { buffer.resize(bytes); }
+      buffer.resize(bytes);
+      copy(temp.begin(), temp.end(), back_inserter(buffer));
+    }
+    if (chunk_size > 0) {
+      r->update_body(buffer);
+    }
+    else {
+      r->add_header(process_footers(buffer));
+      r->remove_chunked();
+      r->add_header("Content-Length", to_string(length));
+      return;
+    }
+
+    do {
+      buffer.resize(buffer_size);
+      bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
+      
+      if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; break; }
+      if (bytes == 0) { break; }
+      if (bytes < buffer_size) { buffer.resize(bytes); }
+      
+      chunk_size = parse_chunk(buffer);
+      if (chunk_size == -1) {
+	std::cerr << "Invalid response from " << fd << std::endl;
+	continue;
+      }
+      if (chunk_size - buffer.size() > 0) {
+        std::vector<char> temp(buffer_size);
+	bytes = recv(fd, &temp.data()[0], buffer_size, 0);
+	if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; break; }
+	if (bytes == 0) { break; }
+	if (bytes < buffer_size) { buffer.resize(bytes); }
+	buffer.resize(bytes);
+	copy(temp.begin(), temp.end(), back_inserter(buffer));
+      }
+      if (chunk_size == 0) {
+	r->add_header(process_footers(buffer));
+	r->remove_chunked();
+	r->add_header("Content-Length", to_string(length));
+	break;
+      }
+      else {
+	r->append_body(buffer);
+      }
+    } while ((bytes > 0) || (chunk_size > 0));
+  }
+  
+
   Response * receive_response(int fd) {
     Response * response = nullptr;
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
-    int check = 1;
     ssize_t bytes = 0;
 
     /*
@@ -190,6 +256,7 @@ public:
     */
     
     do {
+      buffer.resize(buffer_size);
       bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
       
       if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; break; }
@@ -197,17 +264,16 @@ public:
       if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (response == nullptr) {
-        response = parse_response(buffer);
-	check = format_chunk(response, true, buffer);
+	response = parse_response(buffer);
+	if (response->is_chunked()) {
+	  recieve_chunked(response, fd);
+	  break;
+	}
       } else {
-	check = format_chunk(response, false, buffer);
-	if (check == -1) { response->append_body(buffer); }
+	response->append_body(buffer);
       }
 
-      buffer.resize(buffer_size);
-
     } while ((response->body_length() < response->content_length())
-	     || (check > 0)
 	     || (bytes > 0));
 
     /*std::ofstream myfile;

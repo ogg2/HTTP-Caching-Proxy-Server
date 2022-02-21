@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <iterator>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -76,14 +77,12 @@ REQ_TYPES enum_req_type(string req_type) {
 
 
 map<string, string> process_footers(vector<char> buffer) {
-
   vector<char>::const_iterator h = buffer.begin();
   vector<char>::const_iterator t = h;
   vector<char>::const_iterator end = buffer.end();
 
   map<string, string> headers;
-  while ((h != end) && (*h != '\r')) {
-    if (*h == '\n') { break; }
+  while ((h != end) && (*h != '\r') && (*h != '\n')) {
     while ((t != end) && (*t != '\r')) {
       if (*t == '\n') { break; }
       ++t;
@@ -128,11 +127,53 @@ map<string, string> process_footers(vector<char> buffer) {
     if ((t != end) && (*t == '\n')) {
       ++t;
       h = t;
-    }
-    
+    } 
   }
 
   return headers;
+}
+
+
+int parse_chunk(vector<char>& buffer) {
+  vector<char>::const_iterator h = buffer.begin();
+  vector<char>::const_iterator t = h;
+  vector<char>::const_iterator end = buffer.end();
+  
+  vector<char> temp;
+  int hex_val = 0;
+  
+  while ((t != end) && (*t != ';') && (*t != '\r') && (*t != '\n')) { ++t; }
+  vector<char> hex_vect(h, t);
+  hex_vect.push_back('\0');
+  char * hex_str = &hex_vect[0];
+
+  //cout << "hex_str: " << hex_str << endl;
+  
+  try {
+    hex_val = stoi(hex_str, 0, 16);
+  }
+  catch (invalid_argument & ia) {
+    cerr << "Invalid Argument: " << hex_str << endl; //ia.what() << endl;
+    return -1;
+  }
+  
+  while ((t != end) && (*t != '\r') && (*t != '\n')) { ++t; }
+  if ((t != end) && (*t == '\r')) { ++t; }
+  if ((t != end) && (*t == '\n')) { ++t; }
+  h = t;
+  for (int i = 0; i < hex_val; i++) {
+    if (t == end) { break; }
+    ++t;
+  }
+  copy(h, t, back_inserter(temp));
+  
+  while ((t != end) && (*t != '\r') && (*t == '\n')) { ++t; }
+  if (t != end) { ++t; }
+  if ((t != end) && (*t == '\n')) { ++t; }
+  h = t;
+
+  swap(temp, buffer);
+  return hex_val;
 }
 
 
@@ -140,8 +181,6 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
     if (!r->is_chunked()) { return -1; }
 
     if (first_chunk) { buffer = r->get_body(); }
-
-    cout << string(buffer.begin(), buffer.end()) << endl;
     
     vector<char>::const_iterator h = buffer.begin();
     vector<char>::const_iterator t = h;
@@ -150,14 +189,16 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
     vector<char> temp;
     int hex_val = 0;
 
-    while ((t != end) && (*t != ';') && (*t == '\r') && (*t == '\n')) { ++t; }
-    string hex_str(h, t);
+    while ((t != end) && (*t != ';') && (*t != '\r') && (*t != '\n')) { ++t; }
+    vector<char> hex_vect(h, t);
+    hex_vect.push_back('\0');
+    char * hex_str = &hex_vect[0];
     
     try {
       hex_val = stoi(hex_str, 0, 16);
     }
     catch (invalid_argument & ia) {
-      cerr << "Invalid Argument: " << ia.what() << " Hex String: " << hex_str << endl;
+      cerr << "Invalid Argument: " << ia.what() << endl;
       return -1;
     }
 	   
@@ -176,7 +217,7 @@ int format_chunk(Response * r, bool first_chunk, vector<char> buffer) {
     h = t;
 
     if (first_chunk) {
-      r->replace_body(temp);
+      r->update_body(temp);
     }
     else {
       r->append_body(temp);

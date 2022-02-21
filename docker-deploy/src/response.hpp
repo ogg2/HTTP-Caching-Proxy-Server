@@ -83,7 +83,7 @@ public:
     copy(text.begin(), text.end(), back_inserter(body));
   }
 
-  void replace_body(vector<char> text) {
+  void update_body(vector<char> text) {
     swap(text, body);
   }
   
@@ -96,8 +96,11 @@ public:
   bool is_chunked() {
     map<string, string>::iterator it = headers.find("Transfer-Encoding");
     if (it == headers.end()) { return false; }
-    if (it->second.compare("chunked") == 0) { return true; }
-    return false;
+    size_t pos = it->second.find("chunked");
+    if (pos == string::npos) { return false; }
+    string chunked = it->second.substr(pos, pos+7);
+    if (chunked.compare("chunked") != 0) { return false; }
+    return true;
   }
   
   void add_header(string key, string val) {
@@ -114,6 +117,16 @@ public:
 
   vector<char> get_body() {
     return body;
+  }
+
+  void remove_chunked() {
+    map<string, string>::iterator it = headers.find("Transfer-Encoding");
+    if (it == headers.end()) { return; }
+    size_t pos = it->second.find("chunked");
+    if (pos == string::npos) { return; }
+    string chunked = it->second.substr(pos, pos+7);
+    if (chunked.compare("chunked") != 0) { return; }
+    it->second.erase(pos, 8);
   }
 
 };
