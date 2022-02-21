@@ -3,13 +3,13 @@ version: '2'
 services:
   proxy:
     build: ./src
-      command: bash -c ./src/run.sh
-      volumes:
-        - data-volume:/var/log/erss
-        - ./src:/code
-      ports:
-        - "12345:12345"
-      tty: true
+    command: bash -c "./run.sh"
+    volumes:
+      - data-volume:/var/log/erss
+      - ./src:/code
+    ports:
+      - "12345:12345"
+    tty: true
 
 volumes:
   data-volume: 
