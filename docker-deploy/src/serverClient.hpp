@@ -150,7 +150,6 @@ public:
 
       //client is ready so receive from client and send to origin
       if (FD_ISSET(socket_fd, &read_fds)) {
-        std::cout << "Checking receive from origin" << std::endl;
         if ((bytes = recv(socket_fd, &buffer.data()[0], buffer_size, 0)) <= 0) {
           if (bytes == -1) {
             std::cerr << "Error: cannot receive CONNECT data" << std::endl;
@@ -158,34 +157,28 @@ public:
           return; //return if error or if recv returns 0 bytes (close)
         } 
         if (FD_ISSET(client_connection_fd, &write_fds)) {
-          std::cout << "Checking okay to send to client" << std::endl;
           ssize_t status = send(client_connection_fd, &buffer.data()[0], bytes, 0);
           if (status == -1) {
             std::cerr << "Error: cannot send CONNECT data" << std::endl;
             return;
           }
         }
-
-      } 
       //origin is ready so receive from origin and send to client
-      else if (FD_ISSET(client_connection_fd, &read_fds)) {
-        std::cout << "Checking receive from client" << std::endl;
+      } else if (FD_ISSET(client_connection_fd, &read_fds)) {
         if ((bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0)) <= 0) {
           if (bytes == -1) {
             std::cerr << "Error: cannot receive CONNECT data" << std::endl;
           }
           return; //return if error or if recv returns 0 bytes (close)
         }
-     // }
-      if (FD_ISSET(socket_fd, &write_fds)) {
-        std::cout << "Checking okay to send to origin" << std::endl;
-        ssize_t status = send(socket_fd, &buffer.data()[0], bytes, 0);
-        if (status == -1) {
-          std::cerr << "Error: cannot send CONNECT data" << std::endl;
-          return;
+        if (FD_ISSET(socket_fd, &write_fds)) {
+          ssize_t status = send(socket_fd, &buffer.data()[0], bytes, 0);
+          if (status == -1) {
+            std::cerr << "Error: cannot send CONNECT data" << std::endl;
+            return;
+          }
         }
-      }
-    }    
+      }     
     } //while loop
   }
 

@@ -38,7 +38,7 @@ int main () {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
     } else if (ids.count(client_fd) == 0) {
       ids.insert(client_fd);
-      std::thread(proccess_request, std::ref(server), client_fd, std::ref(ids)).detach(); //do we need to use std::ref?
+      std::thread(process_request, std::ref(server), client_fd, std::ref(ids)).detach(); //do we need to use std::ref?
     }
   }
 

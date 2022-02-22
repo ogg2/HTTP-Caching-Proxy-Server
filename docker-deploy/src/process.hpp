@@ -5,6 +5,6 @@
 
 #include "serverClient.hpp"
 
-void proccess_request(ServerClient & server, int fd, std::set<int> & ids);
+void process_request(ServerClient & server, int fd, std::set<int> & ids);
 
 #endif

@@ -15,7 +15,7 @@
 #define THREADLOG "\tThread ID = %s\n"
 
 
-void proccess_request(ServerClient & server, int fd, std::set<int> & ids) {
+void process_request(ServerClient & server, int fd, std::set<int> & ids) {
   //std::cout << "starting thread...\n"; 
   Request * request = server.receive_request(fd);
   //std::cout << "1. recieved request\n";
