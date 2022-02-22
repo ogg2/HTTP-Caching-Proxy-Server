@@ -29,15 +29,30 @@ enum REQ_TYPES : int {
 class Request {
 private:
   REQ_TYPES req_type;
+  string full_url;
   string hostname;
   string port;
   string resource;
   string version;
   map<string, string> headers;
   vector<char> body;
+
+  string req_type_to_string() {
+    switch (req_type) {
+    case GET:
+      return "GET";
+    case POST:
+      return "POST";
+    case CONNECT:
+      return "CONNECT";
+    default:
+      return "BREAK";
+    }
+  }
   
 public:
   Request(REQ_TYPES req_type_,
+	  string full_url_,
 	  string hostname_,
 	  string port_,
 	  string resource_,
@@ -45,6 +60,7 @@ public:
 	  map<string, string> headers_,
 	  vector<char> body_)
     : req_type(req_type_),
+      full_url(full_url_),
       hostname(hostname_),
       port(port_),
       resource(resource_),
@@ -64,21 +80,7 @@ public:
   }
 
   vector<char> make_request() {
-    string req_ty;
-    switch (req_type) {
-    case GET:
-      req_ty = "GET";
-      break;
-    case POST:
-      req_ty = "POST";
-      break;
-    case CONNECT:
-      req_ty = "CONNECT";
-      break;
-    default:
-      req_ty = "BREAK";
-      break;
-    }
+    string req_ty = req_type_to_string();
     vector<char> buffer;
 
     // first line
@@ -109,7 +111,10 @@ public:
 
     return buffer;
   }
-  
+
+  string get_request_line() {
+    return req_type_to_string() + " " + full_url + " " + version;
+  }
 
   ssize_t content_length() {
     map<string, string>::iterator it = headers.find("Content-Length");
@@ -143,12 +148,7 @@ public:
   }
 
   string get_url() {
-    string url = "http://" + hostname;
-    if (port.length() != 0) {
-      url += ":" + port;
-    }
-    url += resource;
-    return url; 
+    return full_url;
   }
 };
 

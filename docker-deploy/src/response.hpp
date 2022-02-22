@@ -158,6 +158,10 @@ public:
     return cache_directives;
   }
 
+  int get_status() {
+    return status_code;
+  }
+
 };
 
 #endif

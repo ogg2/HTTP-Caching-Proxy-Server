@@ -197,6 +197,7 @@ Request * parse_request(const vector<char> req) {
   string hostname = temp[0];
   string resource = temp[1];
   string port = temp[2];
+  string full_url(h, t);
   
   ++t;
   h = t;
@@ -262,7 +263,7 @@ Request * parse_request(const vector<char> req) {
   if ((h != end) && (*h == '\n')) { ++h; }
   vector<char> body(h, end);
 
-  return new Request(req_type, hostname, port, resource, version, headers, body);
+  return new Request(req_type, full_url, hostname, port, resource, version, headers, body);
 }
 
 
