@@ -10,19 +10,20 @@
 #include "serverClient.hpp"
 #include "request.hpp"
 #include "response.hpp"
+#include "log.hpp"
 
 #define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
 #define THREADLOG "\tThread ID = %s\n"
 
 
 void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache * cache) {
-  //std::cout << "starting thread...\n"; 
+  write_log(fd, "Connection opened");
+  
   Request * request = server.receive_request(fd);
-
-  //std::cout << "1. recieved request\n"
 
   if (request == nullptr) {
     std::cerr << "Empty request" << std::endl;
+    write_log(fd, "Received empty request");
     return;
   }
 
@@ -41,10 +42,6 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   bool is_server = false;
   const char * hostname = request->get_hostname();
   const char * port = request->get_port();
-  //std::cout << "1.5. got hostname\n";
-
-  //std::cout << "Request:\n";
-  //request->print();
   
   ServerClient client(hostname, port);
   int status = client.initialize_socket(is_server);
@@ -62,7 +59,6 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     client.close_socket();
     return;
   } 
-  //std::cout << "3. sent request\n"; 
 
   //CacheEntry * cachedResponse;
   Response * response;
@@ -79,8 +75,6 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     cache->add_entry(request->get_url(), entry);
     std::cout << "CACHING NEW ENTRY" << std::endl;
   }
- 
-  //std::cout << "4. recieved response:\n";
   
   client.close_socket();
 
@@ -88,15 +82,12 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     std::cerr << "Error response" << std::endl;
     return;
   }
-  
-  //response->print();
 
   std::vector<char> resp = response->make_response();
   //TODO CacheEntry entry(response, MAX_AGE); create cache entry
   //TODO server.get_cache()->add_entry(RESOURCEURL, &entry);
-  //std::cout << string(resp.begin(), resp.end()) << std::endl;
   server.send_response(resp, fd);
-  //std::cout << "5. sent response:\n";
+  write_log(fd, "Sent response from origin server");
 
   ids.erase(fd);
 }

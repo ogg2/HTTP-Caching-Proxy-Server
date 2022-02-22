@@ -1,7 +1,7 @@
 CPPFLAGS=-std=gnu++11 -pedantic -Wall -Werror -ggdb3 -pthread
 
-proxy: proxy.cpp process.cpp parse.cpp
-	g++ $(CPPFLAGS) -o proxy proxy.cpp process.cpp parse.cpp
+proxy: proxy.cpp process.cpp parse.cpp log.cpp
+	g++ $(CPPFLAGS) -o proxy proxy.cpp process.cpp parse.cpp log.cpp
 
 main-res: main-res.cpp parse.cpp    
 	g++ $(CPPFLAGS) -o main-res main-res.cpp parse.cpp    
