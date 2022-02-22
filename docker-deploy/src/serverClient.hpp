@@ -4,12 +4,14 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <sys/select.h>
 
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <vector>
 #include <string>
+#include <errno.h>
 
 #include "request.hpp"
 #include "response.hpp"
@@ -95,7 +97,7 @@ public:
   bool connect_socket() {
     int status = connect(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
     if (status == -1) {
-      std::cerr << "Error: cannot connect to socket" << std::endl;
+      std::cerr << "Error " << errno << ": cannot connect to socket" << std::endl;
       std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
@@ -122,51 +124,64 @@ public:
     }
 
     while (true) {
-      fd_set rfds;
-      FD_ZERO(&rfds);
-      FD_SET(client_connection_fd, &rfds);
-      FD_SET(socket_fd, &rfds);
-      if (select(client_connection_fd + 1, &rfds, NULL, NULL, NULL) == -1) {
+      fd_set read_fds;
+      fd_set write_fds;
+
+      FD_ZERO(&read_fds);
+      FD_ZERO(&write_fds);
+      FD_SET(client_connection_fd, &read_fds);
+      FD_SET(socket_fd, &read_fds);
+      FD_SET(client_connection_fd, &write_fds);
+      FD_SET(socket_fd, &write_fds);
+
+      if (select(client_connection_fd + 1, &read_fds, &write_fds, NULL, NULL) == -1) {
         std::cerr << "Error: could not CONNECT" << std::endl;
         return;
       }
 
-      ssize_t buffer_size = 1024;
+      ssize_t buffer_size = 10240;
       std::vector<char> buffer(buffer_size);
       int bytes;
 
-      //client is ready so receive from client and send to server
-      if (FD_ISSET(client_connection_fd, &rfds)) {
-        if ((bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0)) <= 0) {
-          if (bytes == -1) {
-            std::cerr << "Error: cannot receive CONNECT data" << std::endl;
-          }
-          return; //return if error or if recv returns 0 bytes (close)
-        } else {
-          std::string buffer_string = std::string(buffer.begin(), buffer.end());
-          const char * buffer_char = buffer_string.c_str();
-          if (send(socket_fd, buffer_char, bytes, 0) == -1) {
-            std::cerr << "Error: cannot send CONNECT data" << std::endl;
-            return;
-          }
-        }
-
-      //server is ready so receive from server and send to client
-      } else if (FD_ISSET(socket_fd, &rfds)) {
+      //client is ready so receive from client and send to origin
+      if (FD_ISSET(socket_fd, &read_fds)) {
+        std::cout << "Checking receive from origin" << std::endl;
         if ((bytes = recv(socket_fd, &buffer.data()[0], buffer_size, 0)) <= 0) {
           if (bytes == -1) {
             std::cerr << "Error: cannot receive CONNECT data" << std::endl;
           }
           return; //return if error or if recv returns 0 bytes (close)
-        } else {
-          std::string buffer_string = std::string(buffer.begin(), buffer.end());
-          const char * buffer_char = buffer_string.c_str();
-          if (send(client_connection_fd, buffer_char, bytes, 0) == -1) {
-            std::cerr << "Error: cannot send CONNECT data" << std::endl;
-            return;
-          }
+        } 
+     // } 
+   //   if (FD_ISSET(client_connection_fd, &read_fds)) {
+        std::cout << "Checking okay to send to client" << std::endl;
+        ssize_t status = send(client_connection_fd, &buffer.data()[0], bytes, 0);
+        if (status == -1) {
+          std::cerr << "Error: cannot send CONNECT data" << std::endl;
+          return;
         }
-      } //new incoming connection
+     // }
+
+    }
+      //origin is ready so receive from origin and send to client
+      else if (FD_ISSET(client_connection_fd, &read_fds)) {
+        std::cout << "Checking receive from client" << std::endl;
+        if ((bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0)) <= 0) {
+          if (bytes == -1) {
+            std::cerr << "Error: cannot receive CONNECT data" << std::endl;
+          }
+          return; //return if error or if recv returns 0 bytes (close)
+        }
+     // }
+     // if (FD_ISSET(socket_fd, &read_fds)) {
+        std::cout << "Checking okay to send to origin" << std::endl;
+        ssize_t status = send(socket_fd, &buffer.data()[0], bytes, 0);
+        if (status == -1) {
+          std::cerr << "Error: cannot send CONNECT data" << std::endl;
+          return;
+        }
+      }
+        
     } //while loop
   }
 
@@ -320,8 +335,8 @@ public:
     return receive_response(socket_fd);
   }
 
-  bool send_request(std::vector<char> message) {
-    return send_response(message, socket_fd);
+  bool send_request(std::vector<char> buffer) {
+    return send_response(buffer, socket_fd);
     /*std::string buffer_string = std::string(message.begin(), message.end()); 
     const char * buffer = buffer_string.c_str();
 
@@ -333,11 +348,8 @@ public:
     return true;*/
   }
 
-  bool send_response(std::vector<char> message, int fd) {
-    std::string buffer_string = std::string(message.begin(), message.end()); 
-    const char * buffer = buffer_string.c_str();
-
-    ssize_t status = send(fd, buffer, message.size(), 0);    
+  bool send_response(std::vector<char> buffer, int fd) {
+    ssize_t status = send(fd, &buffer.data()[0], buffer.size(), 0);    
     if (status == -1) {
       std::cerr << "Error: could not send message on socket" << std::endl;
       return false;
@@ -352,6 +364,10 @@ public:
 
   Cache * get_cache() {
     return cache;
+  }
+
+  int get_fd() {
+    return socket_fd;
   }
 };
 
