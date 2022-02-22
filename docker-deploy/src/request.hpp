@@ -138,6 +138,9 @@ public:
     return port.c_str();
   }
 
+  REQ_TYPES get_type() {
+    return req_type;
+  }
 };
 
 #endif
