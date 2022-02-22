@@ -164,9 +164,9 @@ public:
             std::cerr << "Error: cannot send CONNECT data" << std::endl;
             return;
           }
-      }
+        }
 
-    }
+      } 
       //origin is ready so receive from origin and send to client
       else if (FD_ISSET(client_connection_fd, &read_fds)) {
         std::cout << "Checking receive from client" << std::endl;
@@ -185,7 +185,7 @@ public:
           return;
         }
       }
-        
+    }    
     } //while loop
   }
 
