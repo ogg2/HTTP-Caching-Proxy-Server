@@ -6,6 +6,7 @@
 #include <mutex>
 #include <iostream>
 #include <set>
+#include <boost/thread/mutex.hpp>
 
 #include "serverClient.hpp"
 #include "process.hpp"
@@ -30,8 +31,12 @@ int main () {
   if (status == EXIT_FAILURE) {
     std::cout << "Failed to setup server." << std::endl;
     return EXIT_FAILURE;
-  } 
+  }
+  
   std::set<int> ids;
+
+  boost::mutex log_mu;
+  
   Cache * cache = new Cache;;
   while (1) {
     int client_fd = server.accept_connections();
@@ -40,7 +45,7 @@ int main () {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
     } else if (ids.count(client_fd) == 0) {
       ids.insert(client_fd);
-      std::thread(process_request, std::ref(server), client_fd, std::ref(ids), cache).detach(); //do we need to use std::ref?
+      std::thread(process_request, std::ref(server), client_fd, std::ref(ids), cache, std::ref(log_mu)).detach(); //do we need to use std::ref?
     }
   }
 

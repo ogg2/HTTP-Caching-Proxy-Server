@@ -251,12 +251,6 @@ public:
     ssize_t buffer_size = 1024;
     std::vector<char> buffer(buffer_size);
     ssize_t bytes = 0;
-
-    /*
-    while ((num_of_bytes = recv( c_socket, memblock, file_buf, 0 )) > 0) {
-        dest.write(memblock,num_of_bytes);
-    }
-    */
     
     do {
       buffer.resize(buffer_size);

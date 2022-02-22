@@ -129,6 +129,10 @@ public:
     it->second.erase(pos, 8);
   }
 
+  int get_status() {
+    return status_code;
+  }
+
 };
 
 #endif

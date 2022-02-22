@@ -6,6 +6,8 @@
 #include <mutex>
 #include <iostream>
 #include <set>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "serverClient.hpp"
 #include "request.hpp"
@@ -16,16 +18,18 @@
 #define THREADLOG "\tThread ID = %s\n"
 
 
-void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache * cache) {
-  write_log(fd, "Connection opened");
+void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache * cache, boost::mutex& log_mu) {
   
   Request * request = server.receive_request(fd);
 
   if (request == nullptr) {
     std::cerr << "Empty request" << std::endl;
-    write_log(fd, "Received empty request");
+    //log_request(fd, "Received empty request", log_mu);
     return;
   }
+
+  string request_line = '\"' + request->get_request_line() + '\"';
+  log_request(fd, request_line, log_mu);
 
   CacheEntry * entry;
   if (request->get_type() == GET) {
@@ -34,6 +38,7 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     if (entry != nullptr) {
       std::vector<char> resp = entry->get_response()->make_response();
       server.send_response(resp, fd);
+      //write_log(fd, "Received empty request", log_mu);
       std::cout << "CACHED" << std::endl;
       return;
     }
@@ -69,7 +74,7 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   //} else {
   response = client.client_receive();
   //}
-  if (request->get_type() == GET) {
+  if ((request->get_type() == GET) && (response->get_status() == 200)) {
     //if (request->get_cache_control() == XXXXXXX)
     entry = new CacheEntry(response, 0);
     cache->add_entry(request->get_url(), entry);
@@ -87,7 +92,7 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   //TODO CacheEntry entry(response, MAX_AGE); create cache entry
   //TODO server.get_cache()->add_entry(RESOURCEURL, &entry);
   server.send_response(resp, fd);
-  write_log(fd, "Sent response from origin server");
+  //write_log(fd, "Sent response from origin server", log_mu);
 
   ids.erase(fd);
 }

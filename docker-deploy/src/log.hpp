@@ -2,7 +2,8 @@
 #define LOG_H
 
 #include <string>
+#include <boost/thread/mutex.hpp>
 
-void write_log(int fd, string phrase);
+void log_request(int fd, string request, boost::mutex& log_mu);
 
 #endif
