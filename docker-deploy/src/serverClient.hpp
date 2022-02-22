@@ -134,7 +134,12 @@ public:
       FD_SET(client_connection_fd, &write_fds);
       FD_SET(socket_fd, &write_fds);
 
-      if (select(client_connection_fd + 1, &read_fds, &write_fds, NULL, NULL) == -1) {
+      int max_fd = client_connection_fd;
+      if (socket_fd > client_connection_fd) {
+        max_fd = socket_fd;
+      }
+
+      if (select(max_fd + 1, &read_fds, &write_fds, NULL, NULL) == -1) {
         std::cerr << "Error: could not CONNECT" << std::endl;
         return;
       }
@@ -152,15 +157,14 @@ public:
           }
           return; //return if error or if recv returns 0 bytes (close)
         } 
-     // } 
-   //   if (FD_ISSET(client_connection_fd, &read_fds)) {
-        std::cout << "Checking okay to send to client" << std::endl;
-        ssize_t status = send(client_connection_fd, &buffer.data()[0], bytes, 0);
-        if (status == -1) {
-          std::cerr << "Error: cannot send CONNECT data" << std::endl;
-          return;
-        }
-     // }
+        if (FD_ISSET(client_connection_fd, &write_fds)) {
+          std::cout << "Checking okay to send to client" << std::endl;
+          ssize_t status = send(client_connection_fd, &buffer.data()[0], bytes, 0);
+          if (status == -1) {
+            std::cerr << "Error: cannot send CONNECT data" << std::endl;
+            return;
+          }
+      }
 
     }
       //origin is ready so receive from origin and send to client
@@ -173,7 +177,7 @@ public:
           return; //return if error or if recv returns 0 bytes (close)
         }
      // }
-     // if (FD_ISSET(socket_fd, &read_fds)) {
+      if (FD_ISSET(socket_fd, &write_fds)) {
         std::cout << "Checking okay to send to origin" << std::endl;
         ssize_t status = send(socket_fd, &buffer.data()[0], bytes, 0);
         if (status == -1) {
