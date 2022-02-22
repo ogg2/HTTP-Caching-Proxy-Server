@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <algorithm>
 #include <iterator>
@@ -127,6 +128,34 @@ public:
     string chunked = it->second.substr(pos, pos+7);
     if (chunked.compare("chunked") != 0) { return; }
     it->second.erase(pos, 8);
+  }
+
+  unordered_map<string, int> get_cache_control() {
+    unordered_map<string, int> cache_directives;
+    if (headers.count("Cache-Control") == 0) {
+      return cache_directives;
+    }
+    map<string, string>::iterator it = headers.find("Cache-Control");
+    string directives = it->second;
+    
+    size_t first = 0;
+    size_t delim = directives.find_first_of("=,");
+    while (delim != string::npos) {
+      if (directives[delim] == '=') {
+        string key = directives.substr(first, delim - first);
+        first = delim + 1;
+        delim = directives.find_first_of(",", delim + 1);
+        int seconds = atoi(directives.substr(first, delim).c_str());
+        cache_directives.emplace(key, seconds);
+      
+      } else if (directives[delim] == ',') {
+        string key = directives.substr(first, delim - first);
+        cache_directives.emplace (key, 0);
+      }
+      first = delim;
+      delim = directives.find_first_of("=,", delim + 2);
+    }
+    return cache_directives;
   }
 
 };

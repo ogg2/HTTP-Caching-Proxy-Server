@@ -13,6 +13,7 @@ class CacheEntry {
 private:
   time_t expiration; //tm_wday, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_year
   bool never_expires;
+  bool must_revalidate;
   Response * response;
 
   //okay to just have HashMap where key is url string, value is cache object
@@ -32,12 +33,13 @@ private:
   }
 public:
   //max-age is defined in Cache-Control Directives
-  CacheEntry (Response * r, int max_age) {
+  CacheEntry (Response * r, int max_age, int revalidate) {
     time_t now;
     time (&now); 
     expiration = now + max_age;
     response = r;
-    never_expires = max_age == 0;
+    never_expires = (max_age == 0);
+    must_revalidate = revalidate;
   }
 
   void print_expiration() {

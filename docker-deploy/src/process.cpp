@@ -60,20 +60,33 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     return;
   } 
 
-  //CacheEntry * cachedResponse;
-  Response * response;
-  //if ((cachedResponse = server.get_cache()->find_response(request->get_resource())) != nullptr) {
-  //  std::cout << "------Cached Response------" << std::endl;
-  //  response = cachedResponse->get_response();
-  //TODO check if cache entry is expired
-  //} else {
-  response = client.client_receive();
-  //}
+  Response * response = client.client_receive();
   if (request->get_type() == GET) {
-    //if (request->get_cache_control() == XXXXXXX)
-    entry = new CacheEntry(response, 0);
-    cache->add_entry(request->get_url(), entry);
-    std::cout << "CACHING NEW ENTRY" << std::endl;
+    bool no_store = false;
+    unordered_map<string, int> cache_directives = response->get_cache_control();
+    if (cache_directives.empty()) {
+      entry = new CacheEntry(response, 0, false);
+    } else {
+      int max_age;
+      bool revalidate = false;
+      unordered_map<string, int>::iterator it = cache_directives.find("max-age");
+      if (it != unordered_map<string, int>::end) {
+        max_age = it->second;
+      }
+      it = cache_directives.find("no-cache");
+      if (it != unordered_map<string, int>::end) {
+        revalidate = true;
+      }
+      it = cache_directives.find("no-store");
+      if (it != unordered_map<string, int>::end) {
+        no_store = true;
+      }
+      entry = new CacheEntry(response, max_age, revalidate);
+    }
+    if (!no_store) {
+      cache->add_entry(request->get_url(), entry);
+      std::cout << "CACHING NEW ENTRY" << std::endl;
+    }
   }
   
   client.close_socket();
@@ -84,8 +97,6 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   }
 
   std::vector<char> resp = response->make_response();
-  //TODO CacheEntry entry(response, MAX_AGE); create cache entry
-  //TODO server.get_cache()->add_entry(RESOURCEURL, &entry);
   server.send_response(resp, fd);
   write_log(fd, "Sent response from origin server");
 

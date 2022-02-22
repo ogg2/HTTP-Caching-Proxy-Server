@@ -3,10 +3,12 @@
 
 #include "cacheEntry.hpp"
 #include <unordered_map>
+#include <boost/thread/shared_mutex.hpp>
 
 class Cache {
 private:
   std::unordered_map<std::string, CacheEntry *> cache;
+  boost::shared_mutex cache_mu;
 
 public:
   CacheEntry * find_response(std::string resource) {
