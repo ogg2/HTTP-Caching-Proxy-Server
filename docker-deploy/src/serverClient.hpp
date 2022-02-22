@@ -188,8 +188,7 @@ public:
       bytes = recv(fd, &temp.data()[0], buffer_size, 0);
       if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; return; }
       if (bytes == 0) { return; }
-      if (bytes < buffer_size) { buffer.resize(bytes); }
-      buffer.resize(bytes);
+      if (bytes < buffer_size) { temp.resize(bytes); }
       copy(temp.begin(), temp.end(), back_inserter(buffer));
     }
     if (chunk_size > 0) {
@@ -215,13 +214,12 @@ public:
 	std::cerr << "Invalid response from " << fd << std::endl;
 	continue;
       }
-      if (chunk_size - buffer.size() > 0) {
-        std::vector<char> temp(buffer_size);
+      if (chunk_size - buffer.size()) {
+	std::vector<char> temp(buffer_size);
 	bytes = recv(fd, &temp.data()[0], buffer_size, 0);
-	if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; break; }
-	if (bytes == 0) { break; }
-	if (bytes < buffer_size) { buffer.resize(bytes); }
-	buffer.resize(bytes);
+	if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; return; }
+	if (bytes == 0) { return; }
+	if (bytes < buffer_size) { temp.resize(bytes); }
 	copy(temp.begin(), temp.end(), back_inserter(buffer));
       }
       if (chunk_size == 0) {
