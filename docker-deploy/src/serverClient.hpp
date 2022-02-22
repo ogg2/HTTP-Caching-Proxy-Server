@@ -25,7 +25,6 @@ private:
   struct addrinfo * host_info_list;
   const char * hostname;
   const char * port;
-  Cache * cache;
   //get request - if in cache then return response
 
 public:
@@ -357,10 +356,6 @@ public:
   void close_socket() {
     freeaddrinfo(host_info_list);
     close(socket_fd);
-  }
-
-  Cache * get_cache() {
-    return cache;
   }
 
   int get_fd() {

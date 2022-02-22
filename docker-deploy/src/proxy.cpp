@@ -9,6 +9,7 @@
 
 #include "serverClient.hpp"
 #include "process.hpp"
+#include "cache.hpp"
 
 #define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
 #define THREADLOG "\tThread ID = %s\n"
@@ -31,6 +32,7 @@ int main () {
     return EXIT_FAILURE;
   } 
   std::set<int> ids;
+  Cache * cache = new Cache;;
   while (1) {
     int client_fd = server.accept_connections();
     //std::cout << "fd: " << client_id << std::endl;
@@ -38,10 +40,11 @@ int main () {
       std::cerr << "Error: cannot accept connection on socket" << std::endl;
     } else if (ids.count(client_fd) == 0) {
       ids.insert(client_fd);
-      std::thread(process_request, std::ref(server), client_fd, std::ref(ids)).detach(); //do we need to use std::ref?
+      std::thread(process_request, std::ref(server), client_fd, std::ref(ids), cache).detach(); //do we need to use std::ref?
     }
   }
 
+  delete cache;
   server.close_socket();
   return EXIT_SUCCESS;
 }

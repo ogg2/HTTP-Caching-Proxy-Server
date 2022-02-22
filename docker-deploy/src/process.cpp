@@ -15,16 +15,28 @@
 #define THREADLOG "\tThread ID = %s\n"
 
 
-void process_request(ServerClient & server, int fd, std::set<int> & ids) {
+void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache * cache) {
   //std::cout << "starting thread...\n"; 
   Request * request = server.receive_request(fd);
-  //std::cout << "1. recieved request\n";
+
+  //std::cout << "1. recieved request\n"
 
   if (request == nullptr) {
     std::cerr << "Empty request" << std::endl;
     return;
   }
 
+  CacheEntry * entry;
+  if (request->get_type() == GET) {
+    std::string url = request->get_url();
+    entry = cache->find_response(url);
+    if (entry != nullptr) {
+      std::vector<char> resp = entry->get_response()->make_response();
+      server.send_response(resp, fd);
+      std::cout << "CACHED" << std::endl;
+      return;
+    }
+  }
    
   bool is_server = false;
   const char * hostname = request->get_hostname();
@@ -59,8 +71,14 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids) {
   //  response = cachedResponse->get_response();
   //TODO check if cache entry is expired
   //} else {
-    response = client.client_receive();
+  response = client.client_receive();
   //}
+  if (request->get_type() == GET) {
+    //if (request->get_cache_control() == XXXXXXX)
+    entry = new CacheEntry(response, 0);
+    cache->add_entry(request->get_url(), entry);
+    std::cout << "CACHING NEW ENTRY" << std::endl;
+  }
  
   //std::cout << "4. recieved response:\n";
   

@@ -141,6 +141,15 @@ public:
   REQ_TYPES get_type() {
     return req_type;
   }
+
+  string get_url() {
+    string url = "http://" + hostname;
+    if (port.length() != 0) {
+      url += ":" + port;
+    }
+    url += resource;
+    return url; 
+  }
 };
 
 #endif
