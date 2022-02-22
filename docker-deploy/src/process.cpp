@@ -72,18 +72,18 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     if (cache_directives.empty()) {
       entry = new CacheEntry(response, 0, false);
     } else {
-      int max_age;
+      int max_age = 0;
       bool revalidate = false;
       unordered_map<string, int>::iterator it = cache_directives.find("max-age");
-      if (it != unordered_map<string, int>::end) {
+      if (it != cache_directives.end()) {
         max_age = it->second;
       }
       it = cache_directives.find("no-cache");
-      if (it != unordered_map<string, int>::end) {
+      if (it != cache_directives.end()) {
         revalidate = true;
       }
       it = cache_directives.find("no-store");
-      if (it != unordered_map<string, int>::end) {
+      if (it != cache_directives.end()) {
         no_store = true;
       }
       entry = new CacheEntry(response, max_age, revalidate);
