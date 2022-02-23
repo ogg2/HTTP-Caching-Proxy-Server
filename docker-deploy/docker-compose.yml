@@ -5,7 +5,6 @@ services:
     build: ./src
     command: bash -c "./run.sh"
     volumes:
-      - data-volume:/var/log/erss
       - ./src:/code
       - ./src/log/:/var/log/erss
     ports:
