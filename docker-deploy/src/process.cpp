@@ -113,6 +113,10 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
       if (it != cache_directives.end()) {
         revalidate = true;
       }
+      it = cache_directives.find("must-revalidate");
+      if (it != cache_directives.end()) {
+        revalidate = true;
+      }
       it = cache_directives.find("no-store");
       if (it != cache_directives.end()) {
         no_store = true;

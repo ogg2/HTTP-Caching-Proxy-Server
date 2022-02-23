@@ -71,6 +71,14 @@ public:
   void update_response(Response * new_response) {
     response = new_response;
   }
+
+  //must-revalidate is defined in Cache-Control Directives
+  //no-cache is defined in Cache-Control Directives
+  //if we true, we must revalidate before sending back response only if now stale
+  //if max-age == 0 then there was no expiration and we must revalidate everytime as specified by no-cache directive
+  bool needs_revalidation() {
+    return must_revalidate;
+  }
   
   //max-stale is defined in Cache-Control Directives
   //if request directive indicates a max-stale value, client willing to accept

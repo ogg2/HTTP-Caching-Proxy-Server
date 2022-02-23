@@ -1,0 +1,8 @@
+Danger Log - Homework 2 HTTP Caching Proxy
+Adam Krekorian - agk19
+Owen Gibson - ogg4
+----------------------------
+
+1) How is our code robust to external failures? What failures did we handle in the code? How do we handle them?
+
+2) What is the exception guarantees that we make?
