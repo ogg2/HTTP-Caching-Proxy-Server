@@ -6,8 +6,6 @@
 #include <mutex>
 #include <iostream>
 #include <set>
-//#include <boost/thread/locks.hpp>
-//#include <boost/thread/mutex.hpp>
 
 #include "serverClient.hpp"
 #include "request.hpp"
