@@ -14,8 +14,8 @@
 
 using namespace std;
 
-string LOG_PATH = "./log/proxy.log";
-//string LOG_PATH = "/var/log/erss/proxy.log";
+//string LOG_PATH = "./log/proxy.log";
+string LOG_PATH = "/var/log/erss/proxy.log";
 
 void clear_log() {
   ofstream outfile(LOG_PATH);

@@ -3,13 +3,19 @@ Adam Krekorian - agk19
 Owen Gibson - ogg4
 ----------------------------
 
-1) How is our code robust to external failures? What failures did we handle in the code? How do we handle them?
-   If we have a socket connection/creation failure we do not close the server and instead move to the next request.
+1) We handle failed socket openings, sending, and recieiving gracefully by closing the socket before closing the thread for a given request.
+   However, the errors caused by the system calls do not throw exceptions and thus we cannot guarentee that they will not cause the program
+   to terminate.
 
-2) What is the exception guarantees that we make?
+2) We use C++ STL objects to handle a lot of our data storage. This makes it easier to guarentee that our processing will not
+   throw exceptions. Most of the functions we wrote, however, do not make exception guarentees.
 
 3) Our proxy server does not gracefully close.
 
-4) If the cache entry requires validation and is validated we are just reading the entire response rather than returning the cached response.
+4) We are not always freeing memory before it goes out of scope. This results in a lot of leaked memory.
 
-5) We are not always freeing memory before it goes out of scope. This results in a lot of leaked memory.
+5) We are using standard mutexes, not read/write. There could be performance issues relating to the lack of shared mutexes for read accesses to the cache.
+
+6) We don't have a thread to go through and kick expired cache entries out of the cache.
+   This could lead to the cache filling up relatively quickly (potentially heap overflow?).
+
