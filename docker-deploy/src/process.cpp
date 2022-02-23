@@ -38,7 +38,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
     response = make_400_response();
     server.send_response(response->make_response(), fd);
     log_response(fd, response->get_response_line(), log_mu);
-    //delete response;
+    delete response;
     return;
   }
 
@@ -52,6 +52,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
       std::vector<char> resp = entry->get_response()->make_response();
       server.send_response(resp, fd);
       log_phrase(fd, "in cache, valid", log_mu);
+      delete request;
       return;
     }
     log_phrase(fd, "not in cache", log_mu);
@@ -69,8 +70,8 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
     server.send_response(response->make_response(), fd);
     log_response(fd, response->get_response_line(), log_mu);
     client.close_socket();
-    //delete response;
-    //delete request;
+    delete response;
+    delete request;
     return;
   }
 
@@ -78,7 +79,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
     client.connect_tunnel(fd);
     client.close_socket();
     log_phrase(fd, "Tunnel closed", log_mu);
-    //delete request;
+    delete request;
     return;
   } else if (!client.send_request(request->make_request())) {
     response = make_502_response();

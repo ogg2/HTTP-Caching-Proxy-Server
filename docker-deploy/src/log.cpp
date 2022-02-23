@@ -57,7 +57,7 @@ void log_origin_request(int fd, string request, string server, boost::mutex& log
   log_mu.lock();
   ofstream outfile;
   outfile.open(LOG_PATH, ios_base::app);
-  outfile << fd << ": Requesting" << request << " from " << server << endl;
+  outfile << fd << ": Requesting \"" << request << "\" from " << server << endl;
   log_mu.unlock();
 }
 
@@ -65,7 +65,7 @@ void log_origin_response(int fd, string response, string server, boost::mutex& l
   log_mu.lock();
   ofstream outfile;
   outfile.open(LOG_PATH, ios_base::app);
-  outfile << fd << ": Received" << response << " from " << server << endl;
+  outfile << fd << ": Received \"" << response << "\" from " << server << endl;
   log_mu.unlock();
 }
 

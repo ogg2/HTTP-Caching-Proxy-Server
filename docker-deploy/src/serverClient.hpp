@@ -17,6 +17,7 @@
 #include "response.hpp"
 #include "parse.hpp"
 #include "cache.hpp"
+#include "log.hpp"
 
 class ServerClient {
 private:
@@ -43,7 +44,6 @@ public:
       }
     } else {
       if (get_address_info() && create_socket() && connect_socket()) {
-        std::cout << "Connected to " << hostname << " on port " << port << std::endl;
         return EXIT_SUCCESS;
       }
     }
@@ -53,8 +53,8 @@ public:
   bool get_address_info() {
     int status = getaddrinfo(hostname, port, &host_info, &host_info_list);
     if (status != 0) {
-      std::cerr << "Error: cannot get address info for host" << std::endl;
-      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
+      //std::cerr << "Error: cannot get address info for host" << std::endl;
+      //std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -63,8 +63,8 @@ public:
   bool create_socket() {
     socket_fd = socket(host_info_list->ai_family, host_info_list->ai_socktype, host_info_list->ai_protocol);
     if (socket_fd == -1) {
-      std::cerr << "Error: cannot create socket" << std::endl;
-      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
+      //std::cerr << "Error: cannot create socket" << std::endl;
+      //std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -75,8 +75,8 @@ public:
     int status = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     status = ::bind(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
     if (status == -1) {
-      std::cerr << "Error: cannot bind socket" << std::endl;
-      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
+      //std::cerr << "Error: cannot bind socket" << std::endl;
+      //std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -85,8 +85,8 @@ public:
   bool listen_socket() {
     int status = listen(socket_fd, 100);
     if (status == -1) {
-      std::cerr << "Error: cannot listen on socket" << std::endl; 
-      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
+      //std::cerr << "Error: cannot listen on socket" << std::endl; 
+      //std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -95,8 +95,8 @@ public:
   bool connect_socket() {
     int status = connect(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
     if (status == -1) {
-      std::cerr << "Error " << errno << ": cannot connect to socket" << std::endl;
-      std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
+      //std::cerr << "Error " << errno << ": cannot connect to socket" << std::endl;
+      //std::cerr << "  (" << hostname << ", " << port << ")" << std::endl;
       return false;
     }
     return true;
@@ -107,7 +107,7 @@ public:
     socklen_t socket_addr_len = sizeof(socket_addr);
     int client_connection_fd = accept(socket_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
     if (client_connection_fd == -1) {
-      std::cerr << "Error: cannot accept connection on socket" << std::endl;
+      //std::cerr << "Error: cannot accept connection on socket" << std::endl;
       return EXIT_FAILURE;
     }
     return client_connection_fd;
@@ -117,7 +117,7 @@ public:
     std::string connect_init = "HTTP/1.1 200 OK\r\n\r\n";
     const char * connect_init_char = connect_init.c_str();
     if (send(client_connection_fd, connect_init_char, std::strlen(connect_init_char), 0) == -1) {
-      std::cerr << "Error: cannot send initial CONNECT data" << std::endl;
+      //std::cerr << "Error: cannot send initial CONNECT data" << std::endl;
       return;
     }
 
@@ -138,7 +138,7 @@ public:
       }
 
       if (select(max_fd + 1, &read_fds, &write_fds, NULL, NULL) == -1) {
-        std::cerr << "Error: could not CONNECT" << std::endl;
+        //std::cerr << "Error: could not CONNECT" << std::endl;
         return;
       }
 
@@ -150,14 +150,14 @@ public:
       if (FD_ISSET(socket_fd, &read_fds)) {
         if ((bytes = recv(socket_fd, &buffer.data()[0], buffer_size, 0)) <= 0) {
           if (bytes == -1) {
-            std::cerr << "Error: cannot receive CONNECT data" << std::endl;
+            //std::cerr << "Error: cannot receive CONNECT data" << std::endl;
           }
           return; //return if error or if recv returns 0 bytes (close)
         } 
         if (FD_ISSET(client_connection_fd, &write_fds)) {
           ssize_t status = send(client_connection_fd, &buffer.data()[0], bytes, 0);
           if (status == -1) {
-            std::cerr << "Error: cannot send CONNECT data" << std::endl;
+            //std::cerr << "Error: cannot send CONNECT data" << std::endl;
             return;
           }
         }
@@ -165,14 +165,14 @@ public:
       } else if (FD_ISSET(client_connection_fd, &read_fds)) {
         if ((bytes = recv(client_connection_fd, &buffer.data()[0], buffer_size, 0)) <= 0) {
           if (bytes == -1) {
-            std::cerr << "Error: cannot receive CONNECT data" << std::endl;
+            //std::cerr << "Error: cannot receive CONNECT data" << std::endl;
           }
           return; //return if error or if recv returns 0 bytes (close)
         }
         if (FD_ISSET(socket_fd, &write_fds)) {
           ssize_t status = send(socket_fd, &buffer.data()[0], bytes, 0);
           if (status == -1) {
-            std::cerr << "Error: cannot send CONNECT data" << std::endl;
+            //std::cerr << "Error: cannot send CONNECT data" << std::endl;
             return;
           }
         }
@@ -188,7 +188,7 @@ public:
     vector<char> buffer_temp(buffer);
     int chunk_size = parse_chunk(buffer_temp);
     if (chunk_size == -1) {
-      std::cerr << "Invalid response from " << fd << std::endl;
+      //std::cerr << "Invalid response from " << fd << std::endl;
       return;
     }
     if (chunk_size - buffer_temp.size() > 0) {
@@ -212,7 +212,7 @@ public:
       buffer_temp = buffer;
       chunk_size = parse_chunk(buffer_temp);
       if (chunk_size == -1) {
-	std::cerr << "Invalid response from " << fd << std::endl;
+	//std::cerr << "Invalid response from " << fd << std::endl;
 	continue;
       }
       if (chunk_size - buffer_temp.size() > 0) {
@@ -306,7 +306,7 @@ public:
   bool send_response(std::vector<char> buffer, int fd) {
     ssize_t status = send(fd, &buffer.data()[0], buffer.size(), 0);    
     if (status == -1) {
-      std::cerr << "Error: could not send message on socket" << std::endl;
+      //std::cerr << "Error: could not send message on socket" << std::endl;
       return false;
     }
     return true;
