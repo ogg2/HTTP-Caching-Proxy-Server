@@ -31,12 +31,21 @@ void log_request(int fd, string request, boost::mutex& log_mu) {
   log_mu.lock();
   ofstream outfile;
   outfile.open(LOG_PATH, ios_base::app);
-  outfile << fd << ": " << request << " from " << ip;
+  outfile << fd << ": \"" << request << "\" from " << ip;
   outfile << " @ " << cur_time_str;
   log_mu.unlock();
 }
 
-void log_phrase(int fd, string phrase, boost::mutex& log_mu) {  
+void log_phrase(int fd, string phrase, boost::mutex& log_mu) {
+  if (fd <= 0) {
+    log_mu.lock();
+    ofstream outfile;
+    outfile.open(LOG_PATH, ios_base::app);
+    outfile << "(no-id): " << phrase << endl;
+    log_mu.unlock();
+    return;
+  }
+  
   log_mu.lock();
   ofstream outfile;
   outfile.open(LOG_PATH, ios_base::app);
