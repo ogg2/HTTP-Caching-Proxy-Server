@@ -292,15 +292,6 @@ public:
 
   bool send_request(std::vector<char> buffer) {
     return send_response(buffer, socket_fd);
-    /*std::string buffer_string = std::string(message.begin(), message.end()); 
-    const char * buffer = buffer_string.c_str();
-
-    ssize_t status = send(socket_fd, buffer, message.size(), 0);    
-    if (status == -1) {
-      std::cerr << "Error: could not send message on socket" << std::endl;
-      return false;
-    }
-    return true;*/
   }
 
   bool send_response(std::vector<char> buffer, int fd) {
