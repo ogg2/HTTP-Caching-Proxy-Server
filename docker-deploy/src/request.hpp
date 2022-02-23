@@ -154,6 +154,10 @@ public:
   string get_url() {
     return full_url;
   }
+
+  void add_header(string key, string val) {
+    headers.insert({key, val});
+  }
 };
 
 #endif

@@ -49,9 +49,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, std::mutex& l
         cache->remove_entry(url);
         log_phrase(fd, "in cache, but expired at " + expiration, log_mu);
       } else { //needs revalidation
-        cache->remove_entry(url); //MAYBE DO SOMETHING ELSE
-        //std::vector<char> validation_request = make_validation_request();
-        //server.send_request(validation_request);
+        request->add_header("If-Modified-Since", entry->get_expiration());
         log_phrase(fd, "in cache, requires validation", log_mu);
       }
     } else {
@@ -76,6 +74,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, std::mutex& l
     return;
   }
 
+  //CONNECT 
   if (request->get_type() == CONNECT) {
     client.connect_tunnel(fd);
     client.close_socket();
@@ -98,11 +97,8 @@ void process_request(ServerClient & server, int fd, Cache * cache, std::mutex& l
 
   //304: not modifed after validation request
   if (response->get_status() == 304) { 
-    std::vector<char> resp = entry->get_response()->make_response();
-    server.send_response(resp, fd);
-    log_phrase(fd, "in cache, valid", log_mu); 
-    cache->add_entry(url, entry);
-    return;
+    response = entry->get_response();
+    log_phrase(fd, "NOTE revalidated", log_mu); 
   }
 
   log_origin_response(fd, response->get_response_line(), request->get_hostname(), log_mu);
@@ -194,9 +190,9 @@ bool cache_no_store(unordered_map<string, int> & directives, int fd, std::mutex&
 }
 
 Response * make_502_response() {
-  return new Response(502, "Bad Gateway", map<string, string>(), vector<char>());
+  return new Response(502, "Bad Gateway", std::map<string, string>(), std::vector<char>());
 }
 
 Response * make_400_response() {
-  return new Response(400, "Bad Request", map<string, string>(), vector<char>());
+  return new Response(400, "Bad Request", std::map<string, string>(), std::vector<char>());
 }
