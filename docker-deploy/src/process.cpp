@@ -84,8 +84,8 @@ void process_request(ServerClient & server, int fd, Cache * cache, std::mutex& l
     server.send_response(response->make_response(), fd);
     log_response(fd, response->get_response_line(), log_mu);
     client.close_socket();
-    //delete response;
-    //delete request;
+    delete response;
+    delete request;
     return;
   }
   
@@ -129,17 +129,15 @@ void process_request(ServerClient & server, int fd, Cache * cache, std::mutex& l
     response = make_502_response();
     server.send_response(response->make_response(), fd);
     log_response(fd, response->get_response_line(), log_mu);
-    //delete response;
-    //delete request;
+    delete response;
+    delete request;
     return;
   }
 
-  std::vector<char> resp = response->make_response();
-  server.send_response(resp, fd);
+  server.send_response(response->make_response(), fd);
   log_response(fd, response->get_response_line(), log_mu);
 
-  //delete response;
-  //delete request;
+  delete request;
 }
 
 bool cache_revalidate(unordered_map<string, int> & directives, int fd, std::mutex& log_mu) {
