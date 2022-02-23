@@ -116,6 +116,10 @@ public:
     return req_type_to_string() + " " + full_url + " " + version;
   }
 
+  string get_origin_request_line() {
+    return req_type_to_string() + " " + resource + " " + version;
+  }
+
   ssize_t content_length() {
     map<string, string>::iterator it = headers.find("Content-Length");
     if (it == headers.end()) { return -1; }
