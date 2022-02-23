@@ -1,8 +1,13 @@
 #include <fstream>
 #include <string>
 #include <ctime>
+#include <iostream>
 #include <boost/thread/mutex.hpp>
+
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
 
 using namespace std;
 
@@ -14,13 +19,15 @@ void clear_log() {
 }
 
 string get_ip(int fd) {
-  /*
-  struct sockaddr ip_addr;
-  socklen_t ip_len = 14;
-  if (getpeername(fd, &ip_addr, &ip_len) == -1) { return ""; }
-  string ip(ip_addr.sa_data, ip_addr.sa_data + ip_len);
-  */
-  return "1.2.3.4";
+  struct sockaddr_in ip_addr;
+  socklen_t ip_len = sizeof(ip_addr);
+  if (getpeername(fd, (struct sockaddr *)&ip_addr, &ip_len) == -1) { return ""; }
+
+  char * ip = new char[20];
+  strcpy(ip, inet_ntoa(ip_addr.sin_addr));
+  if (ip == NULL) { return "IP ERROR"; }
+  cout << "ip: " << ip;
+  return ip;
 }
 
 void log_request(int fd, string request, boost::mutex& log_mu) {

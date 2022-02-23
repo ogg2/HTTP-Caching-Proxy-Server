@@ -54,6 +54,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
         std::vector<char> resp = entry->get_response()->make_response();
         server.send_response(resp, fd);
         log_phrase(fd, "in cache, valid", log_mu);
+	delete request;
         return;
       } else if (!entry->needs_revalidation()) {
         std::string expiration = entry->get_expiration();
@@ -65,8 +66,6 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
       }
     } else {
       log_phrase(fd, "not in cache", log_mu);
-      delete request;
-      return;
     }
   }
    
