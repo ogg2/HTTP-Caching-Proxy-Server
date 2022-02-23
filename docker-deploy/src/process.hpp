@@ -6,7 +6,11 @@
 
 #include "serverClient.hpp"
 
-void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache * cache, boost::mutex& log_mu);
+Response * make_502_response();
+
+Response * make_400_response();
+
+void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex& log_mu);
 
 bool cache_revalidate(unordered_map<string, int> & directives, int fd, boost::mutex& log_mu);
 

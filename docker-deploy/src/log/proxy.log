@@ -1,101 +1,288 @@
-4: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:52 2022
-
-8: "CONNECT fonts.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:53 2022
-
-10: "CONNECT ssl.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:53 2022
-
-12: "CONNECT www.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
-
-14: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
-
-14: Tunnel closed
-16: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
-
-16: Tunnel closed
-17: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
-
-15: "CONNECT encrypted-tbn0.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
-
-20: "CONNECT apis.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
-
-17: Tunnel closed
-18: "CONNECT adservice.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
-
-23: "GET http://acme.com/ HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
+4: "GET http://acme.com/metro/ HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+4: not in cache
+4: RequestingGET http://acme.com/metro/ HTTP/1.1 from acme.com
+4: ReceivedHTTP/1.1 200 OK from acme.com
+4: cached
+4: Responding "HTTP/1.1 200 OK"
+7: "GET http://acme.com/resources/leaflet/leaflet.css HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+7: not in cache
+8: "GET http://acme.com/metro/metro.jsm HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+14: "GET http://acme.com/javascript/acme.maps.jsm HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+8: not in cache
+13: "GET http://acme.com/resources/leaflet-overrides.css HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+13: not in cache
+12: "GET http://acme.com/javascript/acme.utils.jsm HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+12: not in cache
+11: "GET http://acme.com/styles.css HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+11: not in cache
+10: "GET http://acme.com/javascript/acme.namespace.jsm HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+10: not in cache
+15: "GET http://acme.com/javascript/acme.maps.zoom5.jsm HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+15: not in cache
+14: not in cache
+16: "GET http://acme.com/javascript/acme.overlaymessage.jsm HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+16: not in cache
+17: "GET http://acme.com/resources/leaflet/leaflet.js HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:43 2022
+17: not in cache
+7: RequestingGET http://acme.com/resources/leaflet/leaflet.css HTTP/1.1 from acme.com
+8: RequestingGET http://acme.com/metro/metro.jsm HTTP/1.1 from acme.com
+15: RequestingGET http://acme.com/javascript/acme.maps.zoom5.jsm HTTP/1.1 from acme.com
+17: RequestingGET http://acme.com/resources/leaflet/leaflet.js HTTP/1.1 from acme.com
+16: RequestingGET http://acme.com/javascript/acme.overlaymessage.jsm HTTP/1.1 from acme.com
+12: RequestingGET http://acme.com/javascript/acme.utils.jsm HTTP/1.1 from acme.com
+13: RequestingGET http://acme.com/resources/leaflet-overrides.css HTTP/1.1 from acme.com
+11: RequestingGET http://acme.com/styles.css HTTP/1.1 from acme.com
+10: RequestingGET http://acme.com/javascript/acme.namespace.jsm HTTP/1.1 from acme.com
+14: RequestingGET http://acme.com/javascript/acme.maps.jsm HTTP/1.1 from acme.com
+15: ReceivedHTTP/1.1 200 OK from acme.com
+15: cached
+16: ReceivedHTTP/1.1 200 OK from acme.com
+16: cached
+15: Responding "HTTP/1.1 200 OK"
+13: ReceivedHTTP/1.1 200 OK from acme.com
+13: cached
+13: Responding "HTTP/1.1 200 OK"
+16: Responding "HTTP/1.1 200 OK"
+12: ReceivedHTTP/1.1 200 OK from acme.com
+12: cached
+12: Responding "HTTP/1.1 200 OK"
+8: ReceivedHTTP/1.1 200 OK from acme.com
+8: cached
+8: Responding "HTTP/1.1 200 OK"
+11: ReceivedHTTP/1.1 200 OK from acme.com
+11: cached
+10: ReceivedHTTP/1.1 200 OK from acme.com
+10: cached
+11: Responding "HTTP/1.1 200 OK"
+10: Responding "HTTP/1.1 200 OK"
+7: ReceivedHTTP/1.1 200 OK from acme.com
+7: cached
+7: Responding "HTTP/1.1 200 OK"
+17: ReceivedHTTP/1.1 200 OK from acme.com
+17: cached
+19: "GET http://acme.com/resources/images/valid-xhtml10-gold.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:44 2022
+9: "GET http://acme.com/mailto/j.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:44 2022
+19: not in cache
+9: not in cache
+20: "GET http://acme.com/resources/images/flags/uk.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:44 2022
+21: "GET http://acme.com/resources/images/flags/france.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:44 2022
+20: not in cache
+21: not in cache
+17: Responding "HTTP/1.1 200 OK"
+14: ReceivedHTTP/1.1 200 OK from acme.com
+14: cached
+14: Responding "HTTP/1.1 200 OK"
+19: RequestingGET http://acme.com/resources/images/valid-xhtml10-gold.png HTTP/1.1 from acme.com
+20: RequestingGET http://acme.com/resources/images/flags/uk.gif HTTP/1.1 from acme.com
+9: RequestingGET http://acme.com/mailto/j.gif HTTP/1.1 from acme.com
+21: RequestingGET http://acme.com/resources/images/flags/france.gif HTTP/1.1 from acme.com
+20: ReceivedHTTP/1.1 200 OK from acme.com
+20: cached
+20: Responding "HTTP/1.1 200 OK"
+19: ReceivedHTTP/1.1 200 OK from acme.com
+19: cached
+19: Responding "HTTP/1.1 200 OK"
+9: ReceivedHTTP/1.1 200 OK from acme.com
+9: cached
+9: Responding "HTTP/1.1 200 OK"
+21: ReceivedHTTP/1.1 200 OK from acme.com
+21: cached
+21: Responding "HTTP/1.1 200 OK"
+18: "GET http://acme.com/favicon.ico HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+18: not in cache
+24: "CONNECT c.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+25: "CONNECT a.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+23: "GET http://acme.com/metro/data.xml HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+26: "CONNECT b.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
 23: not in cache
-23: RequestingGET http://acme.com/ HTTP/1.1 from acme.com
-23: ReceivedHTTP/1.1 200 OK from acme.com
-23: cached
-23: Responding "HTTP/1.1 200 OK"
-25: "GET http://acme.com/styles.css HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-26: "CONNECT pagead2.googlesyndication.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-25: not in cache
-31: "CONNECT www.google-analytics.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-25: RequestingGET http://acme.com/styles.css HTTP/1.1 from acme.com
-25: ReceivedHTTP/1.1 200 OK from acme.com
-25: cached
-25: Responding "HTTP/1.1 200 OK"
-30: "GET http://acme.com/software/thttpd/logos/thttpd_powered_2.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-30: not in cache
-29: "GET http://acme.com/mailto/wa.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-29: not in cache
-28: "GET http://acme.com/resources/images/valid-html401-gold.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-28: not in cache
-27: "GET http://www.google.com/logos/Logo_40wht.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-27: not in cache
-39: "GET http://acme.com/resources/images/atom_ani.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-39: not in cache
-40: "GET http://acme.com/resources/images/anvil.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-40: not in cache
-27: RequestingGET http://www.google.com/logos/Logo_40wht.gif HTTP/1.1 from www.google.com
-30: RequestingGET http://acme.com/software/thttpd/logos/thttpd_powered_2.gif HTTP/1.1 from acme.com
-39: RequestingGET http://acme.com/resources/images/atom_ani.gif HTTP/1.1 from acme.com
-29: RequestingGET http://acme.com/mailto/wa.gif HTTP/1.1 from acme.com
-40: RequestingGET http://acme.com/resources/images/anvil.gif HTTP/1.1 from acme.com
-28: RequestingGET http://acme.com/resources/images/valid-html401-gold.png HTTP/1.1 from acme.com
-42: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
-
-30: ReceivedHTTP/1.1 200 OK from acme.com
-30: cached
-30: Responding "HTTP/1.1 200 OK"
-39: ReceivedHTTP/1.1 200 OK from acme.com
-39: cached
-39: Responding "HTTP/1.1 200 OK"
-29: ReceivedHTTP/1.1 200 OK from acme.com
-29: cached
-28: ReceivedHTTP/1.1 200 OK from acme.com
-28: cached
-28: Responding "HTTP/1.1 200 OK"
-29: Responding "HTTP/1.1 200 OK"
-42: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
-40: ReceivedHTTP/1.1 200 OK from acme.com
-40: cached
-40: Responding "HTTP/1.1 200 OK"
-35: "GET http://acme.com/resources/images/icon_acme_128.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
-
+27: "CONNECT a.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+32: "CONNECT b.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+34: "CONNECT b.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+35: "GET http://acme.com/resources/leaflet/images/layers-2x.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
 35: not in cache
-36: "GET http://acme.com/resources/images/icon_acme_32.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
-
-36: not in cache
-35: RequestingGET http://acme.com/resources/images/icon_acme_128.gif HTTP/1.1 from acme.com
-36: RequestingGET http://acme.com/resources/images/icon_acme_32.gif HTTP/1.1 from acme.com
-36: ReceivedHTTP/1.1 200 OK from acme.com
-36: cached
-36: Responding "HTTP/1.1 200 OK"
+33: "CONNECT c.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+40: "CONNECT b.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+42: "CONNECT a.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+18: RequestingGET http://acme.com/favicon.ico HTTP/1.1 from acme.com
+44: "CONNECT a.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+45: "CONNECT c.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+50: "CONNECT c.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+23: RequestingGET http://acme.com/metro/data.xml HTTP/1.1 from acme.com
+52: "CONNECT b.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+53: "CONNECT a.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+35: RequestingGET http://acme.com/resources/leaflet/images/layers-2x.png HTTP/1.1 from acme.com
+56: "CONNECT c.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+57: "CONNECT b.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+58: "CONNECT c.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+63: "CONNECT a.tile.openstreetmap.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+18: ReceivedHTTP/1.1 404 Not Found from acme.com
+18: Responding "HTTP/1.1 404 Not Found"
+50: Tunnel closed
+24: Tunnel closed
+32: Tunnel closed
 35: ReceivedHTTP/1.1 200 OK from acme.com
 35: cached
 35: Responding "HTTP/1.1 200 OK"
-37: "CONNECT googleads.g.doubleclick.net:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
-
-43: "CONNECT partner.googleadservices.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
-
+57: Tunnel closed
+58: Tunnel closed
+26: Tunnel closed
+52: Tunnel closed
+33: Tunnel closed
+56: Tunnel closed
+25: Tunnel closed
+42: Tunnel closed
+40: Tunnel closed
+27: Tunnel closed
+44: Tunnel closed
+63: Tunnel closed
+23: ReceivedHTTP/1.1 200 OK from acme.com
+23: cached
+23: Responding "HTTP/1.1 200 OK"
+22: "GET http://acme.com/metro/station_12.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:45 2022
+22: not in cache
+60: "GET http://acme.com/metro/station_7bis.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+51: "GET http://acme.com/metro/station_6.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+60: not in cache
+37: "GET http://acme.com/metro/station_2.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+47: "GET http://acme.com/metro/station_8.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+64: "GET http://acme.com/metro/station_3.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+64: not in cache
+43: "GET http://acme.com/metro/station_7.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+46: "GET http://acme.com/metro/station_10.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+51: not in cache
+41: "GET http://acme.com/metro/transfer.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+38: "GET http://acme.com/metro/station_3bis.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+28: "GET http://acme.com/metro/station_4.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+61: "GET http://acme.com/metro/station_11.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+54: "GET http://acme.com/metro/station_14.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+31: "GET http://acme.com/metro/station_9.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+36: "GET http://acme.com/metro/station_1.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+59: "GET http://acme.com/metro/station_5.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+37: not in cache
+49: "GET http://acme.com/metro/station_13.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:46 2022
+47: not in cache
+43: not in cache
+46: not in cache
+41: not in cache
+28: not in cache
+38: not in cache
+61: not in cache
+31: not in cache
+54: not in cache
+36: not in cache
+59: not in cache
+49: not in cache
+22: RequestingGET http://acme.com/metro/station_12.png HTTP/1.1 from acme.com
+60: RequestingGET http://acme.com/metro/station_7bis.png HTTP/1.1 from acme.com
+64: RequestingGET http://acme.com/metro/station_3.png HTTP/1.1 from acme.com
+28: RequestingGET http://acme.com/metro/station_4.png HTTP/1.1 from acme.com
+22: ReceivedHTTP/1.1 200 OK from acme.com
+43: RequestingGET http://acme.com/metro/station_7.png HTTP/1.1 from acme.com
+22: cached
+22: Responding "HTTP/1.1 200 OK"
+61: RequestingGET http://acme.com/metro/station_11.png HTTP/1.1 from acme.com
+38: RequestingGET http://acme.com/metro/station_3bis.png HTTP/1.1 from acme.com
+36: RequestingGET http://acme.com/metro/station_1.png HTTP/1.1 from acme.com
+49: RequestingGET http://acme.com/metro/station_13.png HTTP/1.1 from acme.com
+37: RequestingGET http://acme.com/metro/station_2.png HTTP/1.1 from acme.com
+54: RequestingGET http://acme.com/metro/station_14.png HTTP/1.1 from acme.com
+47: RequestingGET http://acme.com/metro/station_8.png HTTP/1.1 from acme.com
+41: RequestingGET http://acme.com/metro/transfer.png HTTP/1.1 from acme.com
+46: RequestingGET http://acme.com/metro/station_10.png HTTP/1.1 from acme.com
+31: RequestingGET http://acme.com/metro/station_9.png HTTP/1.1 from acme.com
+51: RequestingGET http://acme.com/metro/station_6.png HTTP/1.1 from acme.com
+59: RequestingGET http://acme.com/metro/station_5.png HTTP/1.1 from acme.com
+60: ReceivedHTTP/1.1 200 OK from acme.com
+60: cached
+60: Responding "HTTP/1.1 200 OK"
+64: ReceivedHTTP/1.1 200 OK from acme.com
+64: cached
+64: Responding "HTTP/1.1 200 OK"
+28: ReceivedHTTP/1.1 200 OK from acme.com
+28: cached
+28: Responding "HTTP/1.1 200 OK"
+46: ReceivedHTTP/1.1 200 OK from acme.com
+46: cached
+46: Responding "HTTP/1.1 200 OK"
+31: ReceivedHTTP/1.1 200 OK from acme.com
+59: ReceivedHTTP/1.1 200 OK from acme.com
+31: cached
+59: cached
+31: Responding "HTTP/1.1 200 OK"
+59: Responding "HTTP/1.1 200 OK"
+37: ReceivedHTTP/1.1 200 OK from acme.com
+37: cached
+37: Responding "HTTP/1.1 200 OK"
+61: ReceivedHTTP/1.1 200 OK from acme.com
+61: cached
+61: Responding "HTTP/1.1 200 OK"
+38: ReceivedHTTP/1.1 200 OK from acme.com
+38: cached
+38: Responding "HTTP/1.1 200 OK"
+47: ReceivedHTTP/1.1 200 OK from acme.com
+36: ReceivedHTTP/1.1 200 OK from acme.com
+54: ReceivedHTTP/1.1 200 OK from acme.com
+47: cached
+49: ReceivedHTTP/1.1 200 OK from acme.com
+36: cached
+54: cached
+41: ReceivedHTTP/1.1 200 OK from acme.com
+43: ReceivedHTTP/1.1 200 OK from acme.com
+49: cached
+47: Responding "HTTP/1.1 200 OK"
+36: Responding "HTTP/1.1 200 OK"
+49: Responding "HTTP/1.1 200 OK"
+41: cached
+54: Responding "HTTP/1.1 200 OK"
+41: Responding "HTTP/1.1 200 OK"
+43: cached
+43: Responding "HTTP/1.1 200 OK"
+51: ReceivedHTTP/1.1 200 OK from acme.com
+51: cached
+51: Responding "HTTP/1.1 200 OK"
+29: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:54 2022
+29: Tunnel closed
+62: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:54 2022
+62: Tunnel closed
+65: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:54 2022
+65: Tunnel closed
+66: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:54 2022
+66: Tunnel closed
+67: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:54 2022
+68: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:54 2022
+67: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+71: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:55 2022
+71: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+73: "CONNECT fonts.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:57 2022
+75: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:57 2022
+75: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+77: "CONNECT www.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:57 2022
+79: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:13:58 2022
+79: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+81: "CONNECT apis.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:00 2022
+83: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:00 2022
+83: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+85: "CONNECT adservice.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:03 2022
+86: "CONNECT encrypted-tbn0.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:03 2022
+89: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:03 2022
+89: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+91: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:03 2022
+91: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+93: "CONNECT googleads.g.doubleclick.net:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:05 2022
+95: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:05 2022
+95: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+93: Tunnel closed
+94: "CONNECT www.gnu.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:07 2022
+98: "POST http://r3.o.lencr.org/ HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:08 2022
+98: RequestingPOST http://r3.o.lencr.org/ HTTP/1.1 from r3.o.lencr.org
+101: "CONNECT www.gnu.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:10 2022
+102: "CONNECT www.gnu.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:10 2022
+103: "CONNECT www.gnu.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:10 2022
+100: "CONNECT www.gnu.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:10 2022
+104: "CONNECT www.gnu.org:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 22:14:10 2022
+104: Tunnel closed
+102: Tunnel closed
+100: Tunnel closed
+103: Tunnel closed
+101: Tunnel closed
+94: Tunnel closed

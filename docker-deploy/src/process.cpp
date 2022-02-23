@@ -19,18 +19,31 @@
 #define THREADLOG "\tThread ID = %s\n"
 
 
-void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache * cache, boost::mutex& log_mu) {
+Response * make_502_response() {
+  return new Response(502, "Bad Gateway", map<string, string>(), vector<char>());
+}
+
+Response * make_400_response() {
+  return new Response(400, "Bad Request", map<string, string>(), vector<char>());
+}
+
+void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex& log_mu) {
   
-  Request * request = server.receive_request(fd);
+  Request * request;
+  Response * response;
+  
+  request = server.receive_request(fd);
 
   if (request == nullptr) {
-    // create response for malformed request
     log_request(fd, "ERROR Empty request", log_mu);
+    response = make_400_response();
+    server.send_response(response->make_response(), fd);
+    log_response(fd, response->get_response_line(), log_mu);
+    //delete response;
     return;
   }
 
-  string request_line = '\"' + request->get_request_line() + '\"';
-  log_request(fd, request_line, log_mu);
+  log_request(fd, request->get_request_line(), log_mu);
 
   CacheEntry * entry;
   if (request->get_type() == GET) {
@@ -63,7 +76,12 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   int status = client.initialize_socket(is_server);
   if (status == -1) {
     log_phrase(fd, "ERROR Failed to setup client", log_mu);
+    response = make_502_response();
+    server.send_response(response->make_response(), fd);
+    log_response(fd, response->get_response_line(), log_mu);
     client.close_socket();
+    //delete response;
+    //delete request;
     return;
   }
 
@@ -71,15 +89,21 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     client.connect_tunnel(fd);
     client.close_socket();
     log_phrase(fd, "Tunnel closed", log_mu);
+    //delete request;
     return;
   } else if (!client.send_request(request->make_request())) {
+    response = make_502_response();
+    server.send_response(response->make_response(), fd);
+    log_response(fd, response->get_response_line(), log_mu);
     client.close_socket();
+    //delete response;
+    //delete request;
     return;
   }
   
   log_origin_request(fd, request->get_request_line(), request->get_hostname(), log_mu);
 
-  Response * response = client.client_receive();
+  response = client.client_receive();
 
   log_origin_response(fd, response->get_response_line(), request->get_hostname(), log_mu);
   
@@ -108,7 +132,11 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
 
   if (response == nullptr) {
     std::cerr << "Error response" << std::endl;
-    // make error response
+    response = make_502_response();
+    server.send_response(response->make_response(), fd);
+    log_response(fd, response->get_response_line(), log_mu);
+    //delete response;
+    //delete request;
     return;
   }
 
@@ -116,7 +144,8 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   server.send_response(resp, fd);
   log_response(fd, response->get_response_line(), log_mu);
 
-  ids.erase(fd);
+  //delete response;
+  //delete request;
 }
 
 bool cache_revalidate(unordered_map<string, int> & directives, int fd, boost::mutex& log_mu) {
