@@ -7,7 +7,8 @@
 #include <iostream>
 #include <set>
 //#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "serverClient.hpp"
 #include "process.hpp"
@@ -28,7 +29,7 @@
 
 int main () {
   clear_log();
-  boost::mutex log_mu;
+  std::mutex log_mu;
   
   ServerClient server("0.0.0.0", "12345");
   bool is_server = true;

@@ -2,7 +2,8 @@
 #include <string>
 #include <ctime>
 #include <iostream>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -31,7 +32,7 @@ string get_ip(int fd) {
   return ip;
 }
 
-void log_request(int fd, string request, boost::mutex& log_mu) {
+void log_request(int fd, string request, mutex& log_mu) {
   time_t cur_time = time(nullptr);
   string cur_time_str = asctime(localtime(&cur_time));
   string ip = get_ip(fd);
@@ -44,7 +45,7 @@ void log_request(int fd, string request, boost::mutex& log_mu) {
   log_mu.unlock();
 }
 
-void log_phrase(int fd, string phrase, boost::mutex& log_mu) {
+void log_phrase(int fd, string phrase, mutex& log_mu) {
   if (fd <= 0) {
     log_mu.lock();
     ofstream outfile;
@@ -61,7 +62,7 @@ void log_phrase(int fd, string phrase, boost::mutex& log_mu) {
   log_mu.unlock();
 }
 
-void log_origin_request(int fd, string request, string server, boost::mutex& log_mu) {
+void log_origin_request(int fd, string request, string server, mutex& log_mu) {
   log_mu.lock();
   ofstream outfile;
   outfile.open(LOG_PATH, ios_base::app);
@@ -69,7 +70,7 @@ void log_origin_request(int fd, string request, string server, boost::mutex& log
   log_mu.unlock();
 }
 
-void log_origin_response(int fd, string response, string server, boost::mutex& log_mu) {
+void log_origin_response(int fd, string response, string server, mutex& log_mu) {
   log_mu.lock();
   ofstream outfile;
   outfile.open(LOG_PATH, ios_base::app);
@@ -77,7 +78,7 @@ void log_origin_response(int fd, string response, string server, boost::mutex& l
   log_mu.unlock();
 }
 
-void log_response(int fd, string response, boost::mutex& log_mu) {  
+void log_response(int fd, string response, mutex& log_mu) {  
   log_mu.lock();
   ofstream outfile;
   outfile.open(LOG_PATH, ios_base::app);

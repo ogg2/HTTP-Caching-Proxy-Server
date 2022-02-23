@@ -6,8 +6,8 @@
 #include <mutex>
 #include <iostream>
 #include <set>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/locks.hpp>
+//#include <boost/thread/mutex.hpp>
 
 #include "serverClient.hpp"
 #include "request.hpp"
@@ -15,7 +15,7 @@
 #include "log.hpp"
 #include "process.hpp"
 
-void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex& log_mu) {
+void process_request(ServerClient & server, int fd, Cache * cache, std::mutex& log_mu) {
   
   Request * request;
   Response * response;
@@ -148,7 +148,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
   //delete request;
 }
 
-bool cache_revalidate(unordered_map<string, int> & directives, int fd, boost::mutex& log_mu) {
+bool cache_revalidate(unordered_map<string, int> & directives, int fd, std::mutex& log_mu) {
   unordered_map<string, int>::iterator it = directives.find("no-cache");
   if (it != directives.end()) {
     log_phrase(fd, "cached, but requires re-validation", log_mu);
@@ -179,7 +179,7 @@ int cache_max_age(unordered_map<string, int> & directives, int fd) {
   return 0;
 }
 
-bool cache_no_store(unordered_map<string, int> & directives, int fd, boost::mutex& log_mu) {
+bool cache_no_store(unordered_map<string, int> & directives, int fd, std::mutex& log_mu) {
   unordered_map<string, int>::iterator it = directives.find("no-store");
   if (it != directives.end()) {
     log_phrase(fd, "not cacheable, because no-store", log_mu);
