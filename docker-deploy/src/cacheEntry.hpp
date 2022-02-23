@@ -24,13 +24,14 @@ private:
 
 public:
   //max-age is defined in Cache-Control Directives
-  CacheEntry (Response * r, int max_age, int revalidate) {
+  CacheEntry (Response * r, int max_age, bool revalidate, bool never_expire) {
     time_t now;
     time (&now); 
     expiration = now + max_age;
     response = r;
     never_expires = (max_age == 0);
     must_revalidate = revalidate;
+    never_expires = never_expire;
   }
 
   void print_expiration() {

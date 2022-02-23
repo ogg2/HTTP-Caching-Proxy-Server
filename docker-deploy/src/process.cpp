@@ -104,14 +104,14 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
     bool no_store = false;
     unordered_map<string, int> cache_directives = response->get_cache_control();
     if (cache_directives.empty()) {
-      entry = new CacheEntry(response, 0, false);
+      entry = new CacheEntry(response, 0, false, true);
       log_phrase(fd, "cached", log_mu);
     } else {
       int max_age = cache_max_age(std::ref(cache_directives), fd);
       bool revalidate = cache_revalidate(std::ref(cache_directives), fd, std::ref(log_mu));
       no_store = cache_no_store(std::ref(cache_directives), fd, std::ref(log_mu));
 
-      entry = new CacheEntry(response, max_age, revalidate);
+      entry = new CacheEntry(response, max_age, revalidate, false);
       if (max_age != 0) {
         log_phrase(fd, "cached, expires at " + entry->get_expiration(), log_mu);
       }
@@ -149,6 +149,11 @@ bool cache_revalidate(unordered_map<string, int> & directives, int fd, boost::mu
   }
   it = directives.find("must-revalidate");
   if (it != directives.end()) {
+    log_phrase(fd, "cached, but requires re-validation", log_mu);
+    return true;
+  }
+  it = directives.find("max-age");
+  if (it != directives.end() && it->second == 0) {
     log_phrase(fd, "cached, but requires re-validation", log_mu);
     return true;
   }
