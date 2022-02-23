@@ -76,64 +76,6 @@ REQ_TYPES enum_req_type(string req_type) {
 }
 
 
-map<string, string> process_footers(vector<char> buffer) {
-  vector<char>::const_iterator h = buffer.begin();
-  vector<char>::const_iterator t = h;
-  vector<char>::const_iterator end = buffer.end();
-
-  map<string, string> headers;
-  while ((h != end) && (*h != '\r') && (*h != '\n')) {
-    while ((t != end) && (*t != '\r')) {
-      if (*t == '\n') { break; }
-      ++t;
-    }
-    if (string(h, t).find(':') == string::npos) { break; }
-    vector<char>::const_iterator v = h;
-    while ((v != t) && (*v != ':')) { ++v; }
-    string header_key(h, v);
-    ++v;
-    while ((v != t) && ((*v == ' ') || (*v == '\t'))) { ++v; }
-    string header_val(v, t);
-
-    headers.insert({header_key, header_val});
-
-    if (t == end) { break; }
-    if (*t == '\r') {
-      ++t;
-      h = t;
-    }
-    if ((t != end) && (*t == '\n')) {
-      ++t;
-      h = t;
-    }
-
-    if ((*h == ' ') || (*h == '\t')) {
-      while ((t != end) && (*t != '\r')) {
-	if (*t == '\n') { break; }
-	++t;
-      }
-      while ((h != t) && ((*h == ' ') || (*h == '\t'))) {
-	++h;
-      }
-      string prev_val = headers.find(header_key)->second;
-      headers.erase(header_key);
-      headers.insert({header_key, prev_val + string(h, t)});
-    }
-
-    if ((t != end) && (*t == '\r')) {
-      ++t;
-      h = t;
-    }
-    if ((t != end) && (*t == '\n')) {
-      ++t;
-      h = t;
-    } 
-  }
-
-  return headers;
-}
-
-
 int parse_chunk(vector<char>& buffer) {
   vector<char>::const_iterator h = buffer.begin();
   vector<char>::const_iterator t = h;
@@ -146,8 +88,6 @@ int parse_chunk(vector<char>& buffer) {
   vector<char> hex_vect(h, t);
   hex_vect.push_back('\0');
   char * hex_str = &hex_vect[0];
-
-  //cout << "hex_str: " << hex_str << endl;
   
   try {
     hex_val = stoi(hex_str, 0, 16);
@@ -178,8 +118,6 @@ int parse_chunk(vector<char>& buffer) {
 
 
 Request * parse_request(const vector<char> req) {
-  //cout << "request in parse:\n" << string(req.begin(), req.end()) << endl;
-
   vector<char>::const_iterator h = req.begin();
   vector<char>::const_iterator t = h;
   vector<char>::const_iterator end = req.end();
@@ -268,7 +206,6 @@ Request * parse_request(const vector<char> req) {
 
 
 Response * parse_response(const vector<char> resp) {
-
   vector<char>::const_iterator h = resp.begin();
   vector<char>::const_iterator t = h;
   vector<char>::const_iterator end = resp.end();

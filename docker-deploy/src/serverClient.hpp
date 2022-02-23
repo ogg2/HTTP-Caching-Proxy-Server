@@ -25,7 +25,6 @@ private:
   struct addrinfo * host_info_list;
   const char * hostname;
   const char * port;
-  //get request - if in cache then return response
 
 public:
   ServerClient(const char * hostname_, const char * port_) : hostname(hostname_), port(port_) {
@@ -181,37 +180,27 @@ public:
     } //while loop
   }
 
-
   void recieve_chunked(Response * r, int fd) {
     ssize_t buffer_size = 1024;
     ssize_t bytes = 0;
-    int length = 0;
 
     vector<char> buffer = r->get_body();
-    int chunk_size = parse_chunk(buffer);
+    vector<char> buffer_temp(buffer);
+    int chunk_size = parse_chunk(buffer_temp);
     if (chunk_size == -1) {
       std::cerr << "Invalid response from " << fd << std::endl;
       return;
     }
-    length += chunk_size;
-    if (chunk_size - buffer.size()) {
+    if (chunk_size - buffer_temp.size() > 0) {
       std::vector<char> temp(buffer_size);
       bytes = recv(fd, &temp.data()[0], buffer_size, 0);
       if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; return; }
       if (bytes == 0) { return; }
       if (bytes < buffer_size) { temp.resize(bytes); }
       copy(temp.begin(), temp.end(), back_inserter(buffer));
-    }
-    if (chunk_size > 0) {
       r->update_body(buffer);
     }
-    else {
-      r->add_header(process_footers(buffer));
-      r->remove_chunked();
-      r->add_header("Content-Length", to_string(length));
-      return;
-    }
-
+    if (chunk_size == 0) { return; }
     do {
       buffer.resize(buffer_size);
       bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
@@ -219,13 +208,14 @@ public:
       if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; break; }
       if (bytes == 0) { break; }
       if (bytes < buffer_size) { buffer.resize(bytes); }
-      
-      chunk_size = parse_chunk(buffer);
+
+      buffer_temp = buffer;
+      chunk_size = parse_chunk(buffer_temp);
       if (chunk_size == -1) {
 	std::cerr << "Invalid response from " << fd << std::endl;
 	continue;
       }
-      if (chunk_size - buffer.size()) {
+      if (chunk_size - buffer_temp.size() > 0) {
 	std::vector<char> temp(buffer_size);
 	bytes = recv(fd, &temp.data()[0], buffer_size, 0);
 	if (bytes == -1) { std::cerr << "Invalid response from " << fd << std::endl; return; }
@@ -233,15 +223,8 @@ public:
 	if (bytes < buffer_size) { temp.resize(bytes); }
 	copy(temp.begin(), temp.end(), back_inserter(buffer));
       }
-      if (chunk_size == 0) {
-	r->add_header(process_footers(buffer));
-	r->remove_chunked();
-	r->add_header("Content-Length", to_string(length));
-	break;
-      }
-      else {
-	r->append_body(buffer);
-      }
+      r->append_body(buffer);
+      if (chunk_size == 0) { return; }
     } while ((bytes > 0) || (chunk_size > 0));
   }
   
@@ -272,12 +255,6 @@ public:
 
     } while ((response->body_length() < response->content_length())
 	     || (bytes > 0));
-
-    /*std::ofstream myfile;
-    myfile.open ("log.txt");
-    myfile << "Server received: " << buffer << std::endl;
-    myfile.close();*/
-
     return response;
   }
 
@@ -291,33 +268,21 @@ public:
     do {
       bytes = recv(fd, &buffer.data()[0], buffer_size, 0);
 
-      //std::cout << fd << " recv\n";
-      
       if (bytes == -1) { std::cerr << "error ahhh" << std::endl; break; }
       if (bytes == 0) { break; }
       if (bytes < buffer_size) { buffer.resize(bytes); }
 
       if (request == nullptr) {
         request = parse_request(buffer);
-	//std::cout << fd << "parse\n";
       } else {
         request->append_body(buffer);
-	//std::cout << fd << "append\n";
       }
 
       buffer.resize(buffer_size);
 
-      if (request->content_length() == -1) { break; }
-
-      //std::cout << fd << "before while check\n";
-
-    } while ((request->body_length() < request->content_length()));
-
-    /*std::ofstream myfile;
-    myfile.open ("log.txt");
-    myfile << "Server received: " << buffer << std::endl;
-    myfile.close();*/
-    //std::cout << fd << "outside loop\n";
+    } while ((request->content_length() != -1)
+	     && (request->body_length() < request->content_length()));
+    
     return request;
   }
 
