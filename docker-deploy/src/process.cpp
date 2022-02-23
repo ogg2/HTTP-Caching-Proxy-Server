@@ -13,6 +13,7 @@
 #include "request.hpp"
 #include "response.hpp"
 #include "log.hpp"
+#include "process.hpp"
 
 #define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
 #define THREADLOG "\tThread ID = %s\n"
@@ -36,12 +37,22 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     std::string url = request->get_url();
     entry = cache->find_response(url);
     if (entry != nullptr) {
-      std::vector<char> resp = entry->get_response()->make_response();
-      server.send_response(resp, fd);
-      log_phrase(fd, "in cache, valid", log_mu);
-      return;
+      if (entry->is_fresh()) {
+        std::vector<char> resp = entry->get_response()->make_response();
+        server.send_response(resp, fd);
+        log_phrase(fd, "in cache, valid", log_mu);
+        return;
+      } else if (!entry->needs_revalidation()) {
+        std::string expiration = entry->get_expiration();
+        cache->remove_entry(url);
+        log_phrase(fd, "in cache, but expired at " + expiration, log_mu);
+      } else { //needs revalidation
+        cache->remove_entry(url); //MAYBE DO SOMETHING ELSE
+        log_phrase(fd, "in cache, requires validation", log_mu);
+      }
+    } else {
+      log_phrase(fd, "not in cache", log_mu);
     }
-    log_phrase(fd, "not in cache", log_mu);
   }
    
   bool is_server = false;
@@ -79,25 +90,14 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
       entry = new CacheEntry(response, 0, false);
       log_phrase(fd, "cached", log_mu);
     } else {
-      int max_age = 0;
-      bool revalidate = false;
-      unordered_map<string, int>::iterator it = cache_directives.find("max-age");
-      if (it != cache_directives.end()) {
-        max_age = it->second;
-      }
-      it = cache_directives.find("no-cache");
-      if (it != cache_directives.end()) {
-        revalidate = true;
-      }
-      it = cache_directives.find("must-revalidate");
-      if (it != cache_directives.end()) {
-        revalidate = true;
-      }
-      it = cache_directives.find("no-store");
-      if (it != cache_directives.end()) {
-        no_store = true;
-      }
+      int max_age = cache_max_age(std::ref(cache_directives), fd);
+      bool revalidate = cache_revalidate(std::ref(cache_directives), fd, std::ref(log_mu));
+      no_store = cache_no_store(std::ref(cache_directives), fd, std::ref(log_mu));
+
       entry = new CacheEntry(response, max_age, revalidate);
+      if (max_age != 0) {
+        log_phrase(fd, "cached, expires at " + entry->get_expiration(), log_mu);
+      }
     }
     if (!no_store) {
       cache->add_entry(request->get_url(), entry);
@@ -118,3 +118,44 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
 
   ids.erase(fd);
 }
+
+bool cache_revalidate(unordered_map<string, int> & directives, int fd, boost::mutex& log_mu) {
+  unordered_map<string, int>::iterator it = directives.find("no-cache");
+  if (it != directives.end()) {
+    log_phrase(fd, "cached, but requires re-validation", log_mu);
+    return true;
+  }
+  it = directives.find("must-revalidate");
+  if (it != directives.end()) {
+    log_phrase(fd, "cached, but requires re-validation", log_mu);
+    return true;
+  }
+  return false;
+}
+
+int cache_max_age(unordered_map<string, int> & directives, int fd) {
+  unordered_map<string, int>::iterator it = directives.find("max-age");
+  if (it != directives.end()) {
+    return it->second;
+  }
+  it = directives.find("s-maxage");
+  if (it != directives.end()) {
+    return it->second;
+  }
+  return 0;
+}
+
+bool cache_no_store(unordered_map<string, int> & directives, int fd, boost::mutex& log_mu) {
+  unordered_map<string, int>::iterator it = directives.find("no-store");
+  if (it != directives.end()) {
+    log_phrase(fd, "not cacheable, because no-store", log_mu);
+    return true;
+  }
+  it = directives.find("private");
+  if (it != directives.end()) {
+    log_phrase(fd, "not cacheable, because private", log_mu);
+    return true;
+  }
+  return false;
+}
+
