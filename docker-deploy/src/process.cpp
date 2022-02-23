@@ -15,10 +15,6 @@
 #include "log.hpp"
 #include "process.hpp"
 
-#define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
-#define THREADLOG "\tThread ID = %s\n"
-
-
 void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex& log_mu) {
   
   Request * request;
@@ -38,15 +34,15 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
   log_request(fd, request->get_request_line(), log_mu);
 
   CacheEntry * entry;
+  std::string url = request->get_url();
   if (request->get_type() == GET) {
-    std::string url = request->get_url();
     entry = cache->find_response(url);
     if (entry != nullptr) {
       if (entry->is_fresh()) {
         std::vector<char> resp = entry->get_response()->make_response();
         server.send_response(resp, fd);
         log_phrase(fd, "in cache, valid", log_mu);
-	delete request;
+	      delete request;
         return;
       } else if (!entry->needs_revalidation()) {
         std::string expiration = entry->get_expiration();
@@ -54,6 +50,8 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
         log_phrase(fd, "in cache, but expired at " + expiration, log_mu);
       } else { //needs revalidation
         cache->remove_entry(url); //MAYBE DO SOMETHING ELSE
+        //std::vector<char> validation_request = make_validation_request();
+        //server.send_request(validation_request);
         log_phrase(fd, "in cache, requires validation", log_mu);
       }
     } else {
@@ -97,6 +95,15 @@ void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex&
   log_origin_request(fd, request->get_request_line(), request->get_hostname(), log_mu);
 
   response = client.client_receive();
+
+  //304: not modifed after validation request
+  if (response->get_status() == 304) { 
+    std::vector<char> resp = entry->get_response()->make_response();
+    server.send_response(resp, fd);
+    log_phrase(fd, "in cache, valid", log_mu); 
+    cache->add_entry(url, entry);
+    return;
+  }
 
   log_origin_response(fd, response->get_response_line(), request->get_hostname(), log_mu);
   
