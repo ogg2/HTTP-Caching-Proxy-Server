@@ -19,14 +19,6 @@
 #define THREADLOG "\tThread ID = %s\n"
 
 
-Response * make_502_response() {
-  return new Response(502, "Bad Gateway", map<string, string>(), vector<char>());
-}
-
-Response * make_400_response() {
-  return new Response(400, "Bad Request", map<string, string>(), vector<char>());
-}
-
 void process_request(ServerClient & server, int fd, Cache * cache, boost::mutex& log_mu) {
   
   Request * request;
@@ -189,3 +181,10 @@ bool cache_no_store(unordered_map<string, int> & directives, int fd, boost::mute
   return false;
 }
 
+Response * make_502_response() {
+  return new Response(502, "Bad Gateway", map<string, string>(), vector<char>());
+}
+
+Response * make_400_response() {
+  return new Response(400, "Bad Request", map<string, string>(), vector<char>());
+}

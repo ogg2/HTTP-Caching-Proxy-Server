@@ -12,6 +12,7 @@
 
 #include "request.hpp"
 #include "response.hpp"
+#include "parse.hpp"
 
 using namespace std;
 

@@ -9,6 +9,8 @@
 #include <arpa/inet.h>
 #include <string.h>
 
+#include "log.hpp"
+
 using namespace std;
 
 string LOG_PATH = "./log/proxy.log";
@@ -26,7 +28,6 @@ string get_ip(int fd) {
   char * ip = new char[20];
   strcpy(ip, inet_ntoa(ip_addr.sin_addr));
   if (ip == NULL) { return "IP ERROR"; }
-  cout << "ip: " << ip;
   return ip;
 }
 

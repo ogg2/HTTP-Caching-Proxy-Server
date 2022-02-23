@@ -4,6 +4,8 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
+using std::string;
+
 void clear_log();
 
 string get_ip(int fd);
