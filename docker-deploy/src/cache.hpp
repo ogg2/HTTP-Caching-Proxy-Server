@@ -5,11 +5,14 @@
 #include <mutex>
 
 #include "cacheEntry.hpp"
+#include "log.hpp"
 
 class Cache {
 private:
   std::unordered_map<std::string, CacheEntry *> cache;
   std::mutex cache_mu;
+  size_t cache_size = 0;
+  const size_t max_size = 1000;
 
 public:
   CacheEntry * find_response(std::string resource) {
@@ -23,10 +26,21 @@ public:
     return it->second;
   }
 
-  void add_entry(std::string resource, CacheEntry * entry) {
+  void add_entry(std::string resource, CacheEntry * entry, std::mutex & log_mu) {
     cache_mu.lock();
     if (cache.count(resource) == 0) {
       cache.emplace(resource, entry);
+      cache_size++;
+      if (cache_size > max_size) {
+        unordered_map<std::string, CacheEntry *>::iterator it = cache.begin();
+        size_t count = 0;
+        while (count < (max_size / 10)) {
+          it = cache.erase(it);
+          count++;
+        }
+        log_phrase(0, "NOTE clearing cache", log_mu);
+        cache_size -= (max_size / 10);
+      }
       cache_mu.unlock();
     } else {
       std::unordered_map<std::string, CacheEntry *>::iterator it = cache.find(resource);

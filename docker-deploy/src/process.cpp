@@ -118,7 +118,7 @@ void process_request(ServerClient & server, int fd, Cache * cache, std::mutex& l
       }
     }
     if (!no_store) {
-      cache->add_entry(request->get_url(), entry);
+      cache->add_entry(request->get_url(), entry, std::ref(log_mu));
     }
   }
   

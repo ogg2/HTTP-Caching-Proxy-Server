@@ -19,3 +19,5 @@ Owen Gibson - ogg4
 6) We don't have a thread to go through and kick expired cache entries out of the cache.
    This could lead to the cache filling up relatively quickly (potentially heap overflow?).
 
+7) We have a max cache size of 1000. If on addition we exceed this we remove 100 entries from the cache at random.
+   While the cache is locked this could potentially cause issues with other threads accessing cached data.
