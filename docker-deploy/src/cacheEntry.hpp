@@ -22,15 +22,6 @@ private:
   //linked list only if lru 
   //out of memory then reboot proxy
 
-  bool is_fresh() {
-    if (never_expires) {
-      return true;
-    }
-    time_t now;
-    time (&now);
-    double time_to_expiration = difftime(expiration, now);
-    return time_to_expiration > 0;
-  }
 public:
   //max-age is defined in Cache-Control Directives
   CacheEntry (Response * r, int max_age, int revalidate) {
@@ -50,6 +41,11 @@ public:
     } else {
       std::cout << "Response is expired" << std::endl;
     }
+  }
+
+  std::string get_expiration() {
+    char * time = asctime(gmtime(&expiration));
+    return time;
   }
 
   Response * get_response() {
@@ -104,6 +100,16 @@ public:
     time (&now);
     now = now + min_fresh;
     return expiration > now;
+  }
+
+  bool is_fresh() {
+    if (never_expires) {
+      return true;
+    }
+    time_t now;
+    time (&now);
+    double time_to_expiration = difftime(expiration, now);
+    return time_to_expiration > 0;
   }
 };
 

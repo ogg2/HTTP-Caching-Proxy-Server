@@ -35,6 +35,10 @@ public:
       it->second = entry;
     }
   }
+
+  void remove_entry(std::string resource) {
+    cache.erase(resource);
+  }
 };
 
 #endif
