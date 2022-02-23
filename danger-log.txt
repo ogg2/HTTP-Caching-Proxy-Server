@@ -4,5 +4,12 @@ Owen Gibson - ogg4
 ----------------------------
 
 1) How is our code robust to external failures? What failures did we handle in the code? How do we handle them?
+   If we have a socket connection/creation failure we do not close the server and instead move to the next request.
 
 2) What is the exception guarantees that we make?
+
+3) Our proxy server does not gracefully close.
+
+4) If the cache entry requires validation and is validated we are just reading the entire response rather than returning the cached response.
+
+5) We are not always freeing memory before it goes out of scope. This results in a lot of leaked memory.
