@@ -129,21 +129,26 @@ public:
     string directives = it->second;
     
     size_t first = 0;
+    size_t len = directives.length();
     size_t delim = directives.find_first_of("=,");
     while (delim != string::npos) {
-      if (directives[delim] == '=') {
+      if ((delim < len) && (directives[delim] == '=')) {
         string key = directives.substr(first, delim - first);
+	if (delim + 1 >= len) { break; }
         first = delim + 1;
         delim = directives.find_first_of(",", delim + 1);
+	if (delim >= len) { break; }
         int seconds = atoi(directives.substr(first, delim).c_str());
         cache_directives.emplace(key, seconds);
       
-      } else if (directives[delim] == ',') {
+      } else if ((delim < len) && (directives[delim] == ',')) {
         string key = directives.substr(first, delim - first);
         cache_directives.emplace (key, 0);
       }
       first = delim;
-      delim = directives.find_first_of("=,", delim + 2);
+      if (delim + 2 < len) {
+	delim = directives.find_first_of("=,", delim + 2);
+      }   
     }
     return cache_directives;
   }
