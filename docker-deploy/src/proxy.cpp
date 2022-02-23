@@ -12,6 +12,7 @@
 #include "serverClient.hpp"
 #include "process.hpp"
 #include "cache.hpp"
+#include "log.hpp"
 
 #define LOGGING "Start Logging my task = %d\n \tThread ID: %s\n"
 #define THREADLOG "\tThread ID = %s\n"
@@ -33,6 +34,8 @@ int main () {
     std::cout << "Failed to setup server." << std::endl;
     return EXIT_FAILURE;
   }
+
+  clear_log();
   
   std::set<int> ids;
 

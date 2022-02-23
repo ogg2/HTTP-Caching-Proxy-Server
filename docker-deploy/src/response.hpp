@@ -120,16 +120,6 @@ public:
     return body;
   }
 
-  void remove_chunked() {
-    map<string, string>::iterator it = headers.find("Transfer-Encoding");
-    if (it == headers.end()) { return; }
-    size_t pos = it->second.find("chunked");
-    if (pos == string::npos) { return; }
-    string chunked = it->second.substr(pos, pos+7);
-    if (chunked.compare("chunked") != 0) { return; }
-    it->second.erase(pos, 8);
-  }
-
   unordered_map<string, int> get_cache_control() {
     unordered_map<string, int> cache_directives;
     if (headers.count("Cache-Control") == 0) {
@@ -160,6 +150,10 @@ public:
 
   int get_status() {
     return status_code;
+  }
+
+  string get_response_line() {
+    return version + " " + to_string(status_code) + " " + reason_phrase;
   }
 
 };

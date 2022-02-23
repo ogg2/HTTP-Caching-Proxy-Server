@@ -1,0 +1,101 @@
+4: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:52 2022
+
+8: "CONNECT fonts.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:53 2022
+
+10: "CONNECT ssl.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:53 2022
+
+12: "CONNECT www.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
+
+14: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
+
+14: Tunnel closed
+16: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
+
+16: Tunnel closed
+17: "CONNECT www.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
+
+15: "CONNECT encrypted-tbn0.gstatic.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
+
+20: "CONNECT apis.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
+
+17: Tunnel closed
+18: "CONNECT adservice.google.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:54 2022
+
+23: "GET http://acme.com/ HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+23: not in cache
+23: RequestingGET http://acme.com/ HTTP/1.1 from acme.com
+23: ReceivedHTTP/1.1 200 OK from acme.com
+23: cached
+23: Responding "HTTP/1.1 200 OK"
+25: "GET http://acme.com/styles.css HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+26: "CONNECT pagead2.googlesyndication.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+25: not in cache
+31: "CONNECT www.google-analytics.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+25: RequestingGET http://acme.com/styles.css HTTP/1.1 from acme.com
+25: ReceivedHTTP/1.1 200 OK from acme.com
+25: cached
+25: Responding "HTTP/1.1 200 OK"
+30: "GET http://acme.com/software/thttpd/logos/thttpd_powered_2.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+30: not in cache
+29: "GET http://acme.com/mailto/wa.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+29: not in cache
+28: "GET http://acme.com/resources/images/valid-html401-gold.png HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+28: not in cache
+27: "GET http://www.google.com/logos/Logo_40wht.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+27: not in cache
+39: "GET http://acme.com/resources/images/atom_ani.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+39: not in cache
+40: "GET http://acme.com/resources/images/anvil.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+40: not in cache
+27: RequestingGET http://www.google.com/logos/Logo_40wht.gif HTTP/1.1 from www.google.com
+30: RequestingGET http://acme.com/software/thttpd/logos/thttpd_powered_2.gif HTTP/1.1 from acme.com
+39: RequestingGET http://acme.com/resources/images/atom_ani.gif HTTP/1.1 from acme.com
+29: RequestingGET http://acme.com/mailto/wa.gif HTTP/1.1 from acme.com
+40: RequestingGET http://acme.com/resources/images/anvil.gif HTTP/1.1 from acme.com
+28: RequestingGET http://acme.com/resources/images/valid-html401-gold.png HTTP/1.1 from acme.com
+42: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:55 2022
+
+30: ReceivedHTTP/1.1 200 OK from acme.com
+30: cached
+30: Responding "HTTP/1.1 200 OK"
+39: ReceivedHTTP/1.1 200 OK from acme.com
+39: cached
+39: Responding "HTTP/1.1 200 OK"
+29: ReceivedHTTP/1.1 200 OK from acme.com
+29: cached
+28: ReceivedHTTP/1.1 200 OK from acme.com
+28: cached
+28: Responding "HTTP/1.1 200 OK"
+29: Responding "HTTP/1.1 200 OK"
+42: RequestingPOST http://ocsp.pki.goog/gts1c3 HTTP/1.1 from ocsp.pki.goog
+40: ReceivedHTTP/1.1 200 OK from acme.com
+40: cached
+40: Responding "HTTP/1.1 200 OK"
+35: "GET http://acme.com/resources/images/icon_acme_128.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
+
+35: not in cache
+36: "GET http://acme.com/resources/images/icon_acme_32.gif HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
+
+36: not in cache
+35: RequestingGET http://acme.com/resources/images/icon_acme_128.gif HTTP/1.1 from acme.com
+36: RequestingGET http://acme.com/resources/images/icon_acme_32.gif HTTP/1.1 from acme.com
+36: ReceivedHTTP/1.1 200 OK from acme.com
+36: cached
+36: Responding "HTTP/1.1 200 OK"
+35: ReceivedHTTP/1.1 200 OK from acme.com
+35: cached
+35: Responding "HTTP/1.1 200 OK"
+37: "CONNECT googleads.g.doubleclick.net:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
+
+43: "CONNECT partner.googleadservices.com:443 HTTP/1.1" from 1.2.3.4 @ Tue Feb 22 21:06:58 2022
+

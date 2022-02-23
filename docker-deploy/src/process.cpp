@@ -23,8 +23,8 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   Request * request = server.receive_request(fd);
 
   if (request == nullptr) {
-    std::cerr << "Empty request" << std::endl;
-    //log_request(fd, "Received empty request", log_mu);
+    // create response for malformed request
+    log_request(fd, "ERROR Empty request", log_mu);
     return;
   }
 
@@ -38,10 +38,10 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     if (entry != nullptr) {
       std::vector<char> resp = entry->get_response()->make_response();
       server.send_response(resp, fd);
-      //write_log(fd, "Received empty request", log_mu);
-      std::cout << "CACHED" << std::endl;
+      log_phrase(fd, "in cache, valid", log_mu);
       return;
     }
+    log_phrase(fd, "not in cache", log_mu);
   }
    
   bool is_server = false;
@@ -51,7 +51,7 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   ServerClient client(hostname, port);
   int status = client.initialize_socket(is_server);
   if (status == -1) {
-    std::cout << "Failed to setup client" << std::endl;
+    log_phrase(fd, "ERROR Failed to setup client", log_mu);
     client.close_socket();
     return;
   }
@@ -59,18 +59,25 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
   if (request->get_type() == CONNECT) {
     client.connect_tunnel(fd);
     client.close_socket();
+    log_phrase(fd, "Tunnel closed", log_mu);
     return;
   } else if (!client.send_request(request->make_request())) {
     client.close_socket();
     return;
-  } 
+  }
+  
+  log_origin_request(fd, request->get_request_line(), request->get_hostname(), log_mu);
 
   Response * response = client.client_receive();
-  if (request->get_type() == GET) {
+
+  log_origin_response(fd, response->get_response_line(), request->get_hostname(), log_mu);
+  
+  if ((request->get_type() == GET) && (response->get_status() == 200)) {
     bool no_store = false;
     unordered_map<string, int> cache_directives = response->get_cache_control();
     if (cache_directives.empty()) {
       entry = new CacheEntry(response, 0, false);
+      log_phrase(fd, "cached", log_mu);
     } else {
       int max_age = 0;
       bool revalidate = false;
@@ -90,7 +97,6 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
     }
     if (!no_store) {
       cache->add_entry(request->get_url(), entry);
-      std::cout << "CACHING NEW ENTRY" << std::endl;
     }
   }
   
@@ -98,12 +104,13 @@ void process_request(ServerClient & server, int fd, std::set<int> & ids, Cache *
 
   if (response == nullptr) {
     std::cerr << "Error response" << std::endl;
+    // make error response
     return;
   }
 
   std::vector<char> resp = response->make_response();
   server.send_response(resp, fd);
-  //write_log(fd, "Sent response from origin server", log_mu);
+  log_response(fd, response->get_response_line(), log_mu);
 
   ids.erase(fd);
 }
